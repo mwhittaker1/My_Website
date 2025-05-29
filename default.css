@@ -64,6 +64,16 @@ a:hover
 	width: 1200px;
 }
 
+a {
+  color: #1e90ff;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #104e8b;
+  text-decoration: none;
+}
+
 /*********************************************************************************/
 /* Image Style                                                                   */
 /*********************************************************************************/
@@ -652,6 +662,7 @@ ul.contact li a.icon-rss:before
 {
 	font-size: 1.3em;
 }
+
 
 #featured .title
 {
