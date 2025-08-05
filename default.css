@@ -1,3 +1,68 @@
+/* Project Section Styles (moved from projects.html) */
+.projects-title {
+  color: #ff9933;
+  text-align: center;
+  font-size: 2.7em;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 0.2em;
+  text-shadow: 0 2px 8px #1a1107, 0 1px 0 #fff2e0;
+}
+.project-section {
+  border: 2px dashed #d35400;
+  border-radius: 12px;
+  background: #232323;
+  color: #f4e7d4;
+  padding: 1.2em 1.5em 1.2em 1.5em;
+  margin-bottom: 2.5em;
+  box-shadow: 0 2px 8px rgba(211,84,0,0.07);
+}
+.project-section h3 {
+  margin-top: 0.0em;
+  margin-bottom: 0.0em;
+  font-size: 2.1em;
+  color: #d35400;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+.project-section strong.subheader {
+  color: #ff9933;
+  font-size: 1.08em;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-top: 0.7em;
+  margin-bottom: 0.2em;
+}
+.project-section ul {
+  margin: 0.5em 0 0.5em 1.2em;
+  padding: 0;
+}
+.project-section li {
+  margin-bottom: 0.3em;
+  line-height: 1.5;
+}
+.project-link-block {
+  margin-bottom: 1em;
+}
+.project-link {
+  color: #ffc04d;
+  text-decoration: underline;
+  font-weight: bold;
+  font-size: 1.35em;
+  letter-spacing: 0.5px;
+  margin-top: 0.3em;
+  display: inline-block;
+}
+.project-link:hover {
+  color: #ffb347;
+  text-decoration: underline;
+}
+.project-note {
+  color: #ffb347;
+  font-size: 0.95em;
+  font-style: italic;
+  margin-left: 0.7em;
+}
 
 html, body
 {
