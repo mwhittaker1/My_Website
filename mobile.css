@@ -1,4 +1,51 @@
 /* Mobile-friendly styles for My_Website */
+/* Icon link styles */
+.icon-link {
+  display: inline-block;
+  text-decoration: none;
+  transition: transform 0.3s ease, color 0.3s ease;
+  color: inherit;
+  font-family: inherit;  /* Prevent font family inheritance issues */
+}
+
+.icon-link:hover {
+  transform: scale(1.2);
+}
+
+.icon-link:hover .icon {
+  color: #d35400;
+}
+
+.icon-link .icon {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: inline-block; /* Ensure proper display */
+}
+
+/* Remove the additional icon that appears due to anchor tag */
+.icon-link:before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Fix any potential issues with FontAwesome icon display */
+.icon:before {
+  display: inline-block;
+  font-family: FontAwesome !important;
+}
+
+/* Contact links styling */
+.column3 p a {
+  color: #bd9252;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.column3 p a:hover {
+  color: #d35400;
+  text-decoration: underline;
+}
+
 @media screen and (max-width: 1200px) {
   .container {
     width: 95% !important;
@@ -82,6 +129,17 @@
 
   #header {
     height: auto;
+  }
+  
+  /* Make icons more prominent on mobile */
+  .icon-link {
+    display: block;
+    text-align: center;
+    margin-bottom: 0.5em;
+  }
+  
+  .icon-link .icon {
+    font-size: 1.3em;
   }
 }
 
