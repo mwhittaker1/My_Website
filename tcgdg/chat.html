@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TCGplayer – Deck Chat</title>
+<link rel="stylesheet" href="chat.css" />
+<link rel="stylesheet" href="deck.css" />
+</head>
+<body>
+  <a class="beeper-btn" href="./" aria-label="Back to home" title="Back to home"><img src="assets/beeper.gif" alt="Beeper" /></a>
+  <div class="topline"></div>
+  <header class="top"><div class="logo">TCG<b>PLAYER</b></div><span class="tag">Deck Advisor</span></header>
+
+  <main class="layout">
+    <section class="chat">
+      <div class="chat-head">
+        <img src="assets/beeper.gif" alt="" />
+        <div><b id="who">Beeper</b><small id="tagline">Maximum competitive strength</small></div>
+        <span id="mode"></span><button id="newchat" type="button">New chat</button>
+      </div>
+
+      <!-- Guru suggestions disabled for now
+      <div class="gurus"> Beeper | Sapphire | Levi | Clyde </div>
+      -->
+
+      <div id="messages" class="messages">
+        <div class="msg bot"><span class="name">Beeper</span>How can I help build a deck today?</div>
+      </div>
+      <div id="chips" class="chips"><button class="chip" type="button">Build a competitive Standard deck</button><button class="chip" type="button">Budget deck under $100</button><button class="chip" type="button">Something fun and unusual</button></div>
+      <form id="form" class="composer">
+        <input id="input" autocomplete="off" placeholder="Describe the deck you want…" autofocus />
+        <button id="send">➤</button>
+      </form>
+    </section>
+    <section class="right">
+      <div id="empty" class="empty">Your suggested deck will appear here.</div>
+      <div id="ws" class="ws" hidden>
+        <section class="dcard deckp" aria-label="Deck list">
+          <div class="deck-head"><div><div class="meta"><span class="badge">Standard</span><span id="d-adv"></span></div><h2 id="d-name"></h2></div>
+            <div class="price-block"><div class="market" id="d-price"></div><a class="buy" id="d-buy" target="_blank" rel="noopener">Buy Deck</a></div></div>
+          <div class="toolbar"><b id="d-count"></b><div><label for="sort">Sort:</label><select id="sort"><option value="type">Type Breakdown</option><option value="cmc">Mana Value</option><option value="name">Name</option><option value="price">Price</option></select></div></div>
+          <div class="takes"><span>GURUS' TAKES:</span><span id="tabs" class="tabs"></span></div>
+          <div id="sections" class="sections"></div>
+          <details class="analysis"><summary><span>Strategic analysis &amp; quality scores</span><span class="chev">&#8964;</span></summary><div class="abody" id="analysis"></div></details>
+        </section>
+        <aside class="dcard preview" aria-label="Card preview" aria-live="polite">
+          <div class="eyebrow">CARD PREVIEW</div>
+          <div class="card-img" id="p-img"></div>
+          <div class="pmeta"><span class="src" id="p-src"></span><span class="rarity" id="p-rar"></span></div>
+          <h4 id="p-name"></h4>
+          <div class="mp"><span>Market Price:</span><strong id="p-price"></strong></div>
+          <a class="btn-dark" id="p-buy" target="_blank" rel="noopener">Buy Product &#8599;</a>
+        </aside>
+        <aside class="dcard overview" aria-label="Deck overview">
+          <div class="overview-head"><h3>DECK OVERVIEW</h3><span class="count" id="o-count"></span></div>
+          <div class="ov-body">
+            <div class="box"><div class="eyebrow">MANA CURVE</div><div class="curve" id="o-curve"></div><div class="curve-nums" id="o-curve-n"></div><div class="curve-lbl" id="o-curve-l"></div></div>
+            <div class="box"><div class="eyebrow">CARD TYPE BREAKDOWN</div><div class="grid3" id="o-types"></div></div>
+            <div class="box"><div class="eyebrow">COLOR BREAKDOWN</div><div class="grid2" id="o-colors"></div></div>
+            <div class="box"><div class="eyebrow">RARITY BREAKDOWN</div><div class="grid2" id="o-rarity"></div></div>
+            <div class="box"><div class="hand-head"><div class="eyebrow">SAMPLE HAND (7 CARDS)</div><button class="btn-draw" id="btn-draw" type="button">Draw a sample hand</button></div><div class="hand" id="o-hand"></div></div>
+            <div class="totals" id="totals"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <script src="config.js"></script>
+</body>
+</html>
