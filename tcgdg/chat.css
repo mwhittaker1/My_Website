@@ -53,3 +53,4 @@ body { margin: 0; font-family: Inter, "Segoe UI", system-ui, sans-serif; backgro
 .chip { border: 1px solid #cfd6e4; background: #fff; border-radius: 14px; padding: 4px 11px; font-size: 12px; cursor: pointer; color: #0c2d6b; }
 .chip:hover { background: #eef3ff; }
 #newchat { margin-left: auto; border: 1px solid #cfd6e4; background: #fff; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.logging-notice { display: block; padding: 0 14px 8px; color: #64748b; font-size: 10px; }

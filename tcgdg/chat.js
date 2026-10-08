@@ -5,6 +5,7 @@ let saved = {};
 try { saved = JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch {}
 let state = saved.state || null;
 let history = saved.history || [];
+const sessionId = saved.sessionId || crypto.randomUUID();
 
 function add(cls, who, text) {
   const d = document.createElement('div');
@@ -136,7 +137,8 @@ $('#sections').addEventListener('focusin', rowPreview);
 const TAGS = { Beeper: 'Maximum competitive strength', Sapphire: 'Value, proven consistency & minimal spend', Levi: 'Maximum performance per dollar', Clyde: 'Functional originality & fun' };
 function setIcons(p) { document.querySelectorAll('.beeper-btn img, .chat-head img').forEach((im) => { im.alt = p; im.onerror = () => { im.onerror = null; im.src = 'assets/beeper.png'; }; im.src = 'assets/' + p.toLowerCase() + '.png'; }); }
 function setHeader() { const p = state?.selected_personality || 'Beeper'; setIcons(p); $('#who').textContent = p; $('#tagline').textContent = TAGS[p] || ''; }
-const persist = () => sessionStorage.setItem(KEY, JSON.stringify({ state, history: history.slice(-12) }));
+const persist = () => sessionStorage.setItem(KEY, JSON.stringify({ sessionId, state, history: history.slice(-12) }));
+persist();
 
 for (const m of history) add(m.role === 'user' ? 'user' : 'bot', m.role === 'user' ? 'You' : (m.who || 'Beeper'), m.content);
 
@@ -157,7 +159,7 @@ $('#form').addEventListener('submit', async (e) => {
   try {
     const res = await fetch(API + '/api/chat', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, state, history: history.slice(-12) }),
+      body: JSON.stringify({ message: text, sessionId, state, history: history.slice(-12) }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Request failed');
