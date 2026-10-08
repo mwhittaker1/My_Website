@@ -6,3 +6,13 @@ html, body { margin: 0; background: #f4f5f7; }
 .beeper-btn:hover { transform: scale(1.1); }
 .beeper-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }.stage { position: relative; }
 .stage::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(rgba(244,245,247,0), #f4f5f7); pointer-events: none; }
+
+.beeper-btn { animation: beeper-pulse 2s ease-in-out infinite; }
+.beeper-btn:hover { animation-play-state: paused; box-shadow: 0 0 22px 8px rgba(37,194,139,.9); }
+.beeper-btn img { animation: beeper-bob 3s ease-in-out infinite; }
+@keyframes beeper-pulse {
+  0%, 100% { box-shadow: 0 0 6px 2px rgba(37,194,139,.55), 0 3px 10px rgba(0,0,0,.35); transform: scale(1); }
+  50% { box-shadow: 0 0 22px 9px rgba(37,194,139,.95), 0 3px 10px rgba(0,0,0,.35); transform: scale(1.07); }
+}
+@keyframes beeper-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@media (prefers-reduced-motion: reduce) { .beeper-btn, .beeper-btn img { animation: none; } }
