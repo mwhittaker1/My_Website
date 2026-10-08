@@ -16,3 +16,12 @@ html, body { margin: 0; background: #f4f5f7; }
 }
 @keyframes beeper-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 @media (prefers-reduced-motion: reduce) { .beeper-btn, .beeper-btn img { animation: none; } }
+
+.beeper-btn { position: fixed; }
+.beeper-btn img { position: absolute; inset: 0; opacity: 0; animation: guru-cycle 12s infinite, beeper-bob 3s ease-in-out infinite; }
+.beeper-btn .g1 { opacity: 1; animation-delay: 0s, 0s; }
+.beeper-btn .g2 { animation-delay: 3s, 0s; }
+.beeper-btn .g3 { animation-delay: 6s, 0s; }
+.beeper-btn .g4 { animation-delay: 9s, 0s; }
+@keyframes guru-cycle { 0% { opacity: 0; } 4% { opacity: 1; } 25% { opacity: 1; } 29% { opacity: 0; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .beeper-btn img { animation: none; } .beeper-btn .g2, .beeper-btn .g3, .beeper-btn .g4 { display: none; } }

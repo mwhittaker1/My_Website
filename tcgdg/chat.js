@@ -134,7 +134,7 @@ const rowPreview = (e) => { const r = e.target.closest('.row'); if (r) { setPrev
 $('#sections').addEventListener('mouseover', rowPreview);
 $('#sections').addEventListener('focusin', rowPreview);
 const TAGS = { Beeper: 'Maximum competitive strength', Sapphire: 'Value, proven consistency & minimal spend', Levi: 'Maximum performance per dollar', Clyde: 'Functional originality & fun' };
-function setIcons(p) { document.querySelectorAll('.beeper-btn img, .chat-head img').forEach((im) => { im.alt = p; im.onerror = () => { im.onerror = null; im.src = 'assets/beeper.gif'; }; im.src = 'assets/' + p.toLowerCase() + '.gif'; }); }
+function setIcons(p) { document.querySelectorAll('.beeper-btn img, .chat-head img').forEach((im) => { im.alt = p; im.onerror = () => { im.onerror = null; im.src = 'assets/beeper.png'; }; im.src = 'assets/' + p.toLowerCase() + '.png'; }); }
 function setHeader() { const p = state?.selected_personality || 'Beeper'; setIcons(p); $('#who').textContent = p; $('#tagline').textContent = TAGS[p] || ''; }
 const persist = () => sessionStorage.setItem(KEY, JSON.stringify({ state, history: history.slice(-12) }));
 
