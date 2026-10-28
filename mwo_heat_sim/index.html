@@ -224,6 +224,27 @@ canvas#chart { width: 100%; height: 280px; display: block; }
 .sources li { margin: 3px 0; max-width: 80ch; }
 .busy { opacity: 0.55; transition: opacity 0.15s; }
 @media (prefers-reduced-motion: reduce) { .busy { transition: none; } }
+.replay { display: grid; gap: 8px; margin: 10px 0 4px; }
+.rp-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.rp-row input[type=range] { flex: 1 1 180px; min-width: 140px; }
+.rp-row label { font-size: 13px; color: var(--muted); }
+.rp-time { min-width: 7.5em; font-weight: 600; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.tog { padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--chip); cursor: pointer; font-size: 13.5px; }
+.tog[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-ink); border-color: var(--chip-on); }
+.lights { display: grid; gap: 6px; }
+.lrow { display: grid; grid-template-columns: minmax(120px, 160px) 1fr minmax(70px, auto); gap: 8px; align-items: center; }
+.lname { font-size: 13.5px; }
+.lchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lchip {
+  width: 30px; height: 30px; display: inline-grid; place-items: center; border-radius: 6px; font-weight: 700; font-size: 14px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); transition: box-shadow 0.12s, background 0.12s, color 0.12s;
+}
+.lchip.on { background: var(--c); border-color: var(--c); color: #fff; text-shadow: 0 0 3px rgba(0,0,0,0.65); box-shadow: 0 0 0 2px var(--c), 0 0 14px 4px var(--c); }
+.lread { text-align: right; font-weight: 600; font-size: 13.5px; }
+.lread.down { color: var(--heat); }
+@media (prefers-reduced-motion: reduce) { .lchip { transition: none; } }
+@media (max-width: 560px) { .lrow { grid-template-columns: 1fr auto; } .lchips { grid-column: 1 / -1; order: 3; } }
 </style>
 </head>
 <body>
@@ -285,6 +306,23 @@ canvas#chart { width: 100%; height: 280px; display: block; }
       <h2>Overheat</h2>
       <div id="verdict"></div>
       <div class="table-scroll"><table class="compare" id="compare"></table></div>
+      <div class="replay" id="replay" hidden>
+        <div class="rp-row">
+          <button class="btn" type="button" id="rp-play">▶ Replay in real time</button>
+          <button class="btn ghost" type="button" id="rp-restart">Restart</button>
+          <button class="btn ghost" type="button" id="rp-full">Show full chart</button>
+          <label>Speed <select id="rp-speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label>
+        </div>
+        <div class="rp-row">
+          <input type="range" id="rp-scrub" min="0" max="1000" value="0" aria-label="Replay position">
+          <span class="rp-time" id="rp-time" aria-live="off"></span>
+        </div>
+        <div class="rp-row" role="group" aria-label="Simulation to show">
+          <span class="muted small">Show:</span>
+          <span class="seg" id="rp-sel"></span>
+        </div>
+        <div class="lights" id="rp-lights" aria-label="Weapon groups firing"></div>
+      </div>
       <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Heat over time"></canvas></div>
       <ul class="takeaways" id="takeaways"></ul>
     </section>
@@ -303,7 +341,7 @@ canvas#chart { width: 100%; height: 280px; display: block; }
         <li>Dissipation = (engine sinks × engine cooling + external sinks × cooling) × (1 + dissipation bonus).</li>
         <li>Quirks and skill nodes with the same effect are added together, then applied once. This matches MwoLab.</li>
         <li>Ghost heat uses each weapon’s penalty, threshold and group from the data, and MwoLab’s escalation curve. Shots from the same group within 0.5 s count together; that window is documented by players, not by the data. Ghost heat uses base heat, before heat reduction.</li>
-        <li>A weapon’s heat is added the moment it fires (after any charge time). Cooldown starts when the beam ends. Shutdown happens at 100% heat.</li>
+        <li>Laser heat is applied evenly across the beam duration, starting after any charge time. Every other weapon adds its heat the moment it fires. Cooldown starts when the beam ends. Shutdown happens at 100% heat.</li>
         <li>Not modeled: Ultra AC double-tap and jams, flamers, machine guns, rotary ACs, one-shot launchers, jump jet heat and coolant flush.</li>
       </ul>
     </section>
@@ -717,6 +755,8 @@ canvas#chart { width: 100%; height: 280px; display: block; }
     const anchorTimes = [];
     const trace = record ? [{ t: 0, h: 0 }] : null;
     const groupFires = new Map(active.map((g) => [g.id, []]));
+    const groupSpans = new Map(active.map((g) => [g.id, []])); // { t, end } for the replay lights
+    const weaponSpans = new Map(); // auto-fire only: weapon key -> [{ t, end }]
 
     const members = (g) => [...g.weapons].filter((k) => wmap.has(k));
     const groupReady = (g) => Math.max(...members(g).map((k) => readyAt.get(k)));
@@ -726,22 +766,31 @@ canvas#chart { width: 100%; height: 280px; display: block; }
       return Infinity;
     };
 
+    // Laser heat is a steady inflow over the beam; everything else is a lump added in fireShots.
+    const beams = []; // { s, e, rate }
     const advance = (to) => {
-      const dt = to - t;
-      if (dt <= 0) return;
-      const rate = sys.cooling;
-      if (rate >= 0) {
-        const nh = heat - rate * dt;
-        if (nh < 0 && record && heat > 0) trace.push({ t: t + heat / rate, h: 0 });
-        heat = Math.max(0, nh);
+      while (t < to - 1e-12 && shutdown == null) {
+        let seg = to, inflow = 0;
+        for (let i = beams.length - 1; i >= 0; i--) {
+          const bm = beams[i];
+          if (bm.e <= t + 1e-12) { beams.splice(i, 1); continue; }
+          if (bm.s > t + 1e-12) { if (bm.s < seg) seg = bm.s; continue; }
+          inflow += bm.rate;
+          if (bm.e < seg) seg = bm.e;
+        }
+        const net = inflow - sys.cooling, dt = seg - t;
+        if (net < 0 && heat + net * dt < 0) {
+          if (record && heat > 0) trace.push({ t: t + heat / -net, h: 0 });
+          heat = 0;
+        } else if (net > 0 && heat + net * dt >= sys.maxHeat) {
+          shutdown = t + (sys.maxHeat - heat) / net; heat = sys.maxHeat; t = shutdown; peak = Math.max(peak, heat);
+          if (record) trace.push({ t, h: heat });
+          return;
+        } else heat += net * dt;
+        t = seg;
+        if (heat > peak) peak = heat;
+        if (record) trace.push({ t, h: heat });
       }
-      else {
-        const nh = heat - rate * dt;
-        if (nh >= sys.maxHeat && shutdown == null) { shutdown = t + (sys.maxHeat - heat) / -rate; heat = sys.maxHeat; }
-        else heat = nh;
-      }
-      t = to;
-      if (record) trace.push({ t, h: heat });
     };
 
     const auto = !!(opts.fast || opts.sync);
@@ -771,6 +820,7 @@ canvas#chart { width: 100%; height: 280px; display: block; }
           if (bucket) bucket.keys.push(k); else shots.push({ t: shotAt, keys: [k] });
         }
         groupFires.get(g.id).push(t);
+        groupSpans.get(g.id).push({ t, end: beamEnd });
         if (g.mode === "cd") nextAllowed.set(g.id, t + 1e-6);
         if (g.mode === "after") pending.delete(g.id);
         if (g === anchor) anchorTimes.push(t);
@@ -814,6 +864,7 @@ canvas#chart { width: 100%; height: 280px; display: block; }
       const fireWeapon = (w) => {
         readyAt.set(w.key, t + w.s.cycle);
         const shotAt = t + w.s.charge;
+        if (record) { if (!weaponSpans.has(w.key)) weaponSpans.set(w.key, []); weaponSpans.get(w.key).push({ t, end: shotAt + w.s.firing + w.s.duration }); }
         if (w.s.ghostKey) decided.push({ t: shotAt, key: w.s.ghostKey });
         const bucket = shots.find((x) => Math.abs(x.t - shotAt) < 1e-9);
         if (bucket) bucket.keys.push(w.key); else shots.push({ t: shotAt, keys: [w.key] });
@@ -856,7 +907,8 @@ canvas#chart { width: 100%; height: 280px; display: block; }
       let add = 0;
       for (const k of s.keys) {
         const w = wmap.get(k);
-        add += w.s.heat; damage += w.s.damage; totalShots++;
+        if (w.s.duration > 0) beams.push({ s: s.t, e: s.t + w.s.duration, rate: w.s.heat / w.s.duration }); else add += w.s.heat;
+        damage += w.s.damage; totalShots++;
         if (w.s.ghostKey) { if (!byKey.has(w.s.ghostKey)) byKey.set(w.s.ghostKey, []); byKey.get(w.s.ghostKey).push(w); }
       }
       let ghost = 0;
@@ -877,7 +929,7 @@ canvas#chart { width: 100%; height: 280px; display: block; }
     const unit = auto ? "rotation" : anchor ? `group ${anchor.id} volley` : "volley";
     return {
       shutdown, peak, peakPct: peak / sys.maxHeat, damage, totalShots, volleys: safeAnchor,
-      anchor: anchor ? anchor.id : null, unit, auto, trace, maxHeat: sys.maxHeat, endTime: Math.min(t, T), maxTime: T, groupFires,
+      anchor: anchor ? anchor.id : null, unit, auto, trace, maxHeat: sys.maxHeat, endTime: Math.min(t, T), maxTime: T, groupFires, groupSpans, weaponSpans,
     };
   }
 
@@ -924,6 +976,9 @@ const state = {
   skills: { heatGen: 0, coolRun: 0, containment: 0, cooldown: 0, laserDuration: 0 },
   env: { map: "normal", moving: false }, opts: { ghost: true, maxTime: 120, fast: false, sync: false },
 };
+
+const SCEN = [["none", "No heat skills", "base"], ["yours", "Your skills", "heat"], ["max", "All heat skills", "cool"]];
+const replay = { sel: "all", show: { none: true, yours: true, max: true }, speed: 1, t: null, playing: false, raf: 0, last: 0, runs: null };
 
 const store = {
   get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
@@ -1210,7 +1265,7 @@ function renderAutoNote(auto) {
 function renderResults(runs, groups) {
   if (!runs || (!runs.yours.auto && !groups.some((g) => g.mode !== "off"))) {
     $("verdict").innerHTML = `<p class="muted">Set up at least one group that fires to see when the build overheats.</p>`;
-    $("compare").innerHTML = ""; $("takeaways").innerHTML = ""; drawChart(null); return;
+    $("compare").innerHTML = ""; $("takeaways").innerHTML = ""; setReplayRuns(null); drawChart(null); return;
   }
   const y = runs.yours;
   const label = y.unit;
@@ -1237,6 +1292,7 @@ function renderResults(runs, groups) {
   const hit = y.trace?.filter((p) => p.shot && p.ghost > 0) || [];
   if (state.opts.ghost !== false && hit.length) tk.push(`Ghost heat triggers ${hit.length} time${hit.length === 1 ? "" : "s"} with your skills, adding ${f1(hit.reduce((s, p) => s + p.ghost, 0))} heat. Splitting groups more than 0.5 s apart avoids it.`);
   $("takeaways").innerHTML = tk.map((t) => `<li>${t}</li>`).join("");
+  setReplayRuns(runs);
   drawChart(runs);
 }
 function deltaText(a, b) {
@@ -1253,6 +1309,16 @@ function sentence(who, a, b, label) {
 }
 
 /* ---------- Chart ---------- */
+function clipTrace(tr, P) {
+  const out = [];
+  for (const p of tr) {
+    if (p.t <= P) { out.push(p); continue; }
+    const prev = out[out.length - 1];
+    if (prev && p.t > prev.t) out.push({ t: P, h: prev.h + (p.h - prev.h) * (P - prev.t) / (p.t - prev.t) });
+    break;
+  }
+  return out;
+}
 function drawChart(runs) {
   const cv = $("chart"), dpr = window.devicePixelRatio || 1;
   const w = cv.clientWidth, h = cv.clientHeight;
@@ -1260,7 +1326,9 @@ function drawChart(runs) {
   const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
   if (!runs) return;
   const C = COLORS();
-  const list = [["none", C.base, "No heat skills"], ["yours", C.heat, "Your skills"], ["max", C.cool, "All heat skills"]];
+  const P = replay.t;
+  const list = SCEN.map(([k, name, col]) => [k, C[col], name]);
+  const shown = list.filter(([k]) => replay.show[k]);
   const ends = list.map(([k]) => runs[k].shutdown ?? runs[k].endTime);
   const T = Math.max(10, Math.min(runs.yours.maxTime, Math.max(...ends) + 3));
   const maxP = Math.max(1.05, ...list.map(([k]) => Math.min(1.6, runs[k].peakPct)));
@@ -1273,20 +1341,111 @@ function drawChart(runs) {
   for (let t = 0; t <= T; t += step) { ctx.fillText(`${t}s`, X(t) - 8, h - 10); }
   ctx.strokeStyle = C.ink; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(pad.l, Y(1)); ctx.lineTo(w - pad.r, Y(1)); ctx.stroke(); ctx.setLineDash([]);
   ctx.fillStyle = C.ink; ctx.fillText("Shutdown", w - pad.r - 54, Y(1) - 5);
-  for (const [k, col] of list) {
-    const r = runs[k]; const tr = r.trace; if (!tr) continue;
+  for (const [k, col] of shown) {
+    const r = runs[k]; if (!r.trace) continue;
+    const pts = P == null ? r.trace : clipTrace(r.trace, P);
     ctx.strokeStyle = col; ctx.lineWidth = k === "yours" ? 2.5 : 1.75; ctx.beginPath();
-    tr.forEach((p, i) => { const x = X(Math.min(p.t, T)), y = Y(Math.min(p.h / r.maxHeat, maxP)); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    pts.forEach((p, i) => { const x = X(Math.min(p.t, T)), y = Y(Math.min(p.h / r.maxHeat, maxP)); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
     ctx.stroke();
-    if (r.shutdown != null) {
-      const x = X(r.shutdown), y = Y(Math.min(1, maxP)); ctx.lineWidth = 2;
+    if (P != null && pts.length) {
+      const e = pts[pts.length - 1]; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(X(Math.min(e.t, T)), Y(Math.min(e.h / r.maxHeat, maxP)), 4, 0, 6.2832); ctx.fill();
+    }
+    if (r.shutdown != null && (P == null || P >= r.shutdown)) {
+      const x = X(r.shutdown), y = Y(Math.min(1, maxP)); ctx.lineWidth = 2; ctx.strokeStyle = col;
       ctx.beginPath(); ctx.moveTo(x - 5, y - 5); ctx.lineTo(x + 5, y + 5); ctx.moveTo(x + 5, y - 5); ctx.lineTo(x - 5, y + 5); ctx.stroke();
     }
   }
+  if (P != null) {
+    ctx.strokeStyle = C.muted; ctx.lineWidth = 1; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(X(P), pad.t); ctx.lineTo(X(P), h - pad.b); ctx.stroke(); ctx.setLineDash([]);
+  }
   let lx = pad.l; ctx.font = "12.5px 'Saira Semi Condensed', 'Arial Narrow', sans-serif";
-  for (const [, col, name] of list) { ctx.fillStyle = col; ctx.fillRect(lx, 8, 14, 3); ctx.fillStyle = C.ink; ctx.fillText(name, lx + 18, 13); lx += ctx.measureText(name).width + 34; }
-  cv.setAttribute("aria-label", `Heat over time. ${list.map(([k, , n]) => `${n}: ${fmtTime(runs[k])}`).join(". ")}.`);
+  for (const [, col, name] of shown) { ctx.fillStyle = col; ctx.fillRect(lx, 8, 14, 3); ctx.fillStyle = C.ink; ctx.fillText(name, lx + 18, 13); lx += ctx.measureText(name).width + 34; }
+  cv.setAttribute("aria-label", `Heat over time. ${shown.map(([k, , n]) => `${n}: ${fmtTime(runs[k])}`).join(". ")}.`);
 }
+
+/* ---------- Real-time replay ---------- */
+const rpDuration = () => {
+  const r = replay.runs; if (!r) return 0;
+  return Math.max(0.1, ...SCEN.filter(([k]) => replay.show[k]).map(([k]) => r[k].shutdown ?? r[k].endTime));
+};
+function glowSpans(run, g) {
+  if (!run.auto) return run.groupSpans?.get(g) || [];
+  const out = [];
+  for (const [key, set] of state.member) if (set.has(g)) out.push(...(run.weaponSpans?.get(key) || []));
+  return out;
+}
+function setReplayRuns(runs) {
+  replay.runs = runs;
+  $("replay").hidden = !runs;
+  if (!runs) { rpStop(); replay.t = null; return; }
+  $("rp-sel").innerHTML = [["all", "All at once"], ...SCEN.map(([k, n]) => [k, n])].map(([k, n]) => `<button type="button" class="tog" data-rpsel="${k}" aria-pressed="${replay.sel === k}">${n}</button>`).join("");
+  buildLights();
+  if (replay.t != null) replay.t = Math.min(replay.t, rpDuration());
+  rpUpdate(false);
+}
+function buildLights() {
+  const runs = replay.runs, C = COLORS(), used = usedGroups();
+  replay.lights = [];
+  if (!used.length) { $("rp-lights").innerHTML = `<p class="muted small">Put weapons in groups to see the group lights.</p>`; return; }
+  $("rp-lights").innerHTML = SCEN.filter(([k]) => replay.show[k]).map(([k, name, col]) => {
+    const r = runs[k];
+    replay.lights.push({ k, run: r, spans: new Map(used.map((g) => [g, glowSpans(r, g)])) });
+    return `<div class="lrow" data-lrow="${k}" style="--c:${C[col]}">
+      <span class="lname"><span class="swatch" style="background:${C[col]}"></span>${name}</span>
+      <span class="lchips">${used.map((g) => `<span class="lchip" data-lg="${g}" title="Group ${g}">${g}</span>`).join("")}</span>
+      <span class="lread" data-lread></span></div>`;
+  }).join("");
+}
+function rpUpdate(redraw = true) {
+  const P = replay.t, D = rpDuration();
+  $("rp-time").textContent = P == null ? `${f1(D)} s total` : `${f1(P)} / ${f1(D)} s`;
+  $("rp-scrub").value = P == null ? 0 : Math.round((P / D) * 1000);
+  $("rp-play").textContent = replay.playing ? "❚❚ Pause" : P != null && P < D ? "▶ Resume" : "▶ Replay in real time";
+  const minGlow = 0.3 * replay.speed;
+  for (const L of replay.lights || []) {
+    const row = $("rp-lights").querySelector(`[data-lrow="${L.k}"]`); if (!row) continue;
+    row.querySelectorAll(".lchip").forEach((chip) => {
+      const on = P != null && L.spans.get(Number(chip.dataset.lg)).some((sp) => P >= sp.t && P <= Math.max(sp.end, sp.t + minGlow));
+      chip.classList.toggle("on", on);
+    });
+    const rd = row.querySelector("[data-lread]");
+    const down = P != null && L.run.shutdown != null && P >= L.run.shutdown;
+    rd.classList.toggle("down", down);
+    rd.textContent = P == null ? "" : down ? "SHUTDOWN" : pct(clipTrace(L.run.trace, P).slice(-1)[0]?.h / L.run.maxHeat || 0, 0);
+  }
+  if (redraw) drawChart(replay.runs);
+}
+function rpStop() { replay.playing = false; cancelAnimationFrame(replay.raf); }
+function rpFrame(now) {
+  if (!replay.playing) return;
+  const D = rpDuration();
+  replay.t = Math.min(D, replay.t + ((now - replay.last) / 1000) * replay.speed);
+  replay.last = now;
+  if (replay.t >= D) replay.playing = false;
+  rpUpdate();
+  if (replay.playing) replay.raf = requestAnimationFrame(rpFrame);
+}
+function rpPlay() {
+  if (!replay.runs) return;
+  if (replay.t == null || replay.t >= rpDuration()) replay.t = 0;
+  replay.playing = true; replay.last = performance.now();
+  cancelAnimationFrame(replay.raf); replay.raf = requestAnimationFrame(rpFrame);
+  rpUpdate();
+}
+$("rp-play").addEventListener("click", () => { if (replay.playing) { rpStop(); rpUpdate(); } else rpPlay(); });
+$("rp-restart").addEventListener("click", () => { rpStop(); replay.t = 0; rpPlay(); });
+$("rp-full").addEventListener("click", () => { rpStop(); replay.t = null; rpUpdate(); });
+$("rp-speed").addEventListener("change", (e) => { replay.speed = Number(e.target.value) || 1; rpUpdate(false); });
+$("rp-scrub").addEventListener("input", (e) => { rpStop(); replay.t = (Number(e.target.value) / 1000) * rpDuration(); rpUpdate(); });
+$("rp-sel").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-rpsel]"); if (!b) return;
+  replay.sel = b.dataset.rpsel;
+  for (const [k] of SCEN) replay.show[k] = replay.sel === "all" || replay.sel === k;
+  $("rp-sel").querySelectorAll(".tog").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.rpsel === replay.sel)));
+  buildLights();
+  if (replay.t != null) replay.t = Math.min(replay.t, rpDuration());
+  rpUpdate();
+});
 
 /* ---------- Breakpoints ---------- */
 function mixHTML(r) {
