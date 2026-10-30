@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<title>Release notes | Hearth and Soul (TEST SITE)</title>
+<style>
+:root{--ink:#2a1a0c;--muted:#6b5440;--line:#e1d3bb;--bg:#faf6ee;--brand:#603820}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.flag{background:#b00020;color:#fff;text-align:center;padding:.5rem 1rem;font-weight:700}
+main{max-width:50rem;margin:0 auto;padding:1.25rem 1rem 4rem}
+h1{font-size:1.7rem;margin:.5rem 0}
+h2{font-size:1.2rem;margin:1.8rem 0 .5rem}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{background:#f3e9d6;font-size:.9rem}
+.tag{display:inline-block;font-size:.78rem;font-weight:700;border-radius:999px;padding:.05rem .55rem;white-space:nowrap}
+.real{background:#d9f2dd;color:#14532d}
+.fake{background:#fde2e1;color:#7f1d1d}
+.part{background:#fff3c4;color:#6b4e00}
+a{color:var(--brand)}
+code{background:#f3e9d6;padding:.05rem .3rem;border-radius:4px}
+.muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="flag">TEST SITE: nothing here is a real order or payment</div>
+<main>
+  <p><a href="./">← Back to the test page</a> · <a href="test_admin/">Test admin</a></p>
+  <h1>Release notes: what’s real and what’s not</h1>
+  <p class="muted">Test build, October 30, 2026. This page is the honest list. If something isn’t listed as real, assume it is not.</p>
+
+  <h2>Real</h2>
+  <table>
+    <thead><tr><th>What</th><th></th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Menu items, names, categories, prices</td><td><span class="tag real">REAL DATA</span></td><td>Read from the bakery’s GoDaddy store with a read-only token. Only items switched on for the <em>Online Ordering</em> channel are shown. Display names (like “Breakfast Sandwich”) can be overridden in a config file.</td></tr>
+      <tr><td>Pickup rules</td><td><span class="tag real">REAL LOGIC</span></td><td>Later of 24 hours’ notice or the next open window, up to 14 days ahead, in hourly windows, Eastern time, including the November 1 clock change. Covered by automated tests, using the same code the page runs.</td></tr>
+      <tr><td>Hours</td><td><span class="tag part">YOUR HOURS</span></td><td>Thu to Sat 9 to 5, Sun 10 to 2, as told to us. They are set in this test site, not read from GoDaddy (GoDaddy doesn’t expose them).</td></tr>
+      <tr><td>Blackout dates and hours editing</td><td><span class="tag part">REAL LOGIC, LOCAL SAVE</span></td><td>The rules honor blackout dates. But edits made in <a href="test_admin/">Test admin</a> are saved in <em>your browser only</em> until the downloaded <code>settings.json</code> is committed.</td></tr>
+      <tr><td>Test clock</td><td><span class="tag real">REAL</span></td><td>The “Set a date and time to test from” control drives the menu’s pickup times, the cart, the checkout check, and the admin preview. It is remembered in your browser.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Partly real</h2>
+  <table>
+    <thead><tr><th>What</th><th></th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Refresh catalogue button</td><td><span class="tag part">DEPENDS ON SETUP</span></td><td><strong>Without the test server:</strong> it re-reads the saved snapshot file and shows what changed. The snapshot only updates when someone re-runs <code>npm run menu</code> and publishes the file. <strong>With the test server</strong> (the test server on the helper’s PC): it pulls straight from GoDaddy, cached about 15 seconds. The GoDaddy token never goes in the browser either way.</td></tr>
+      <tr><td>Submissions log in this browser</td><td><span class="tag real">REAL</span></td><td>Every test checkout is saved in this browser and listed at <a href="test_submissions/">Test submissions</a> (time, reference, name, pickup, items, total, with a click-through to the full message). Only this device can see it. Card details are never saved.</td></tr>
+      <tr><td>Shared submissions log</td><td><span class="tag part">REAL WHILE THE TEST SERVER IS RUNNING</span></td><td>When this page is opened through the test server running on the helper’s PC, each test order is also saved there, and you and Sam can both open <a href="test_submissions/">Test submissions</a> with a password. Entries are deleted after 90 days. If the PC is off or the page is hosted somewhere else, only the browser’s own log is available.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Fake (simulated on purpose)</h2>
+  <table>
+    <thead><tr><th>What</th><th></th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Cart and checkout pages</td><td><span class="tag fake">FAKE</span></td><td>Built to look and flow like GoDaddy’s hosted checkout (cart, contact, pickup, payment, confirmation). They are not GoDaddy’s pages. Every one has a red border and a red banner.</td></tr>
+      <tr><td>Payment</td><td><span class="tag fake">FAKE</span></td><td>No payment is taken. Only well-known test card numbers (like 4242 4242 4242 4242) are accepted. Anything else is cleared as you type. Card details are never stored or sent anywhere.</td></tr>
+      <tr><td>Order in GoDaddy</td><td><span class="tag fake">NONE CREATED</span></td><td>Nothing is written to the GoDaddy store: no orders, no customers, no inventory changes.</td></tr>
+      <tr><td>Sales tax</td><td><span class="tag fake">FAKE</span></td><td>A flat 8% test value. The real site would let GoDaddy calculate tax.</td></tr>
+      <tr><td>Captcha</td><td><span class="tag fake">FAKE</span></td><td>A click-to-pass lookalike. It stops nothing.</td></tr>
+      <tr><td>Order number and confirmation page</td><td><span class="tag fake">FAKE</span></td><td>The reference (like TEST-261030-AB12) is made up in your browser.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Not built yet / known limits</h2>
+  <ul>
+    <li><strong>No server-side checks.</strong> This site is static, so the pickup time is only re-checked in the browser. A real launch needs a server to re-check time and price before taking an order.</li>
+    <li><strong>It is only online while the PC is on.</strong> The test server runs on the helper’s PC, and the public address (a free tunnel) changes each time it is started. This is a test setup, not hosting.</li>
+    <li><strong>No emails are sent.</strong> Orders are logged at Test submissions instead. Emailing the bakery or customers needs a real mail service and is not built.</li>
+    <li><strong>The admin page has no password, and neither does the page that shows this browser’s own log.</strong> It only changes your own browser’s settings, so that’s safe for now, but it is not a real admin yet.</li>
+    <li><strong>No photos or descriptions.</strong> GoDaddy has none for these items. They’ll come from a file keyed by SKU code once collected.</li>
+    <li><strong>Contact form, news, and visit sections</strong> are still the prototype’s placeholder content. The contact form shows a copy-and-paste fallback instead of sending.</li>
+    <li><strong>Keandro font not used.</strong> The licence found is desktop-only, so a web licence is needed before it can go on a website.</li>
+    <li><strong>Holiday and Catering items</strong> appear as GoDaddy categorizes them. Seasonal items are switched on and off by hand in GoDaddy.</li>
+  </ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* Test-site chrome: top bar, refresh row, and the red-bordered cart/checkout pages. */
+#testbar{background:#FFF3C4;color:#3a2a00;font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;border-bottom:2px solid #C9A227;padding:.5rem 1rem}
+#testbar .tb-row{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .9rem;margin:.15rem 0}
+#testbar .tb-flag{background:#B00020;color:#fff;border-radius:4px;padding:.1rem .5rem;letter-spacing:.04em}
+#testbar a{color:#3a2a00;text-decoration:underline}
+#testbar .tb-sub{opacity:.75}
+#testbar input[type="datetime-local"]{font:inherit;padding:.3rem .45rem;border:1.5px solid #8a6d00;border-radius:6px;background:#fff;color:#222;color-scheme:light}
+#testbar .tb-btn{font:inherit;font-size:.9rem;padding:.25rem .6rem;border:1.5px solid #8a6d00;border-radius:999px;background:#fff;color:#3a2a00;cursor:pointer}
+#testbar .tb-btn:hover{background:#FFE9A0}
+#testbar .tb-presets{display:inline-flex;flex-wrap:wrap;gap:.35rem}
+#testbar .tb-note{font-size:.92rem;min-height:1.3em}
+
+.menu-tools{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .8rem;margin:.25rem 0 1rem}
+.menu-tools .fine{margin:0}
+
+/* --- Spoofed cart / checkout. Red border = this is a fake page. --- */
+#hsflow{position:fixed;inset:0;z-index:1000;overflow:auto;background:#F3F3F1;color:#1d1d1d;border:8px solid #D40000;
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:light}
+#hsflow[hidden]{display:none}
+#hsflow .fl-banner{position:sticky;top:0;z-index:2;background:#D40000;color:#fff;text-align:center;font-weight:700;padding:.6rem 1rem;letter-spacing:.02em}
+#hsflow .fl-wrap{max-width:62rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+#hsflow h1,#hsflow h2{font-family:inherit;font-style:normal;color:#1d1d1d;font-weight:650;margin:0 0 .75rem}
+#hsflow h1{font-size:1.6rem}
+#hsflow h2{font-size:1.1rem}
+#hsflow .fl-top{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1rem}
+#hsflow .fl-store{font-weight:650}
+#hsflow .fl-grid{display:grid;grid-template-columns:1fr;gap:1.25rem}
+@media(min-width:820px){#hsflow .fl-grid{grid-template-columns:1.25fr 1fr}}
+#hsflow .fl-card{background:#fff;border:1px solid #d6d6d2;border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+#hsflow label{display:block;font-weight:600;font-size:.93rem;margin-bottom:.8rem}
+#hsflow label .opt{font-weight:400;color:#666}
+#hsflow input[type="text"],#hsflow input[type="email"],#hsflow input[type="tel"],#hsflow textarea{display:block;width:100%;margin-top:.25rem;font:inherit;padding:.65rem .75rem;border:1.5px solid #9a9a95;border-radius:8px;background:#fff;color:#1d1d1d}
+#hsflow input:focus,#hsflow textarea:focus{outline:2px solid #1a73e8;outline-offset:1px;border-color:#1a73e8}
+#hsflow .fl-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+#hsflow .fl-row .wide{grid-column:span 3}
+@media(max-width:520px){#hsflow .fl-row{grid-template-columns:1fr 1fr}#hsflow .fl-row .wide{grid-column:span 2}}
+#hsflow .fl-lines{list-style:none;margin:0;padding:0}
+#hsflow .fl-lines li{display:grid;grid-template-columns:1fr auto;gap:.2rem .75rem;align-items:center;padding:.6rem 0;border-bottom:1px solid #e7e7e3}
+#hsflow .fl-lines .nm{font-weight:600}
+#hsflow .fl-lines .qty{display:inline-flex;align-items:center;gap:.4rem;margin-top:.25rem}
+#hsflow .fl-lines .qty button,#hsflow .fl-link{font:inherit;border:1px solid #9a9a95;background:#fff;border-radius:6px;min-width:2rem;min-height:2rem;cursor:pointer;color:#1d1d1d}
+#hsflow .fl-link{border:0;background:none;text-decoration:underline;color:#1a56b0;min-width:0;padding:0}
+#hsflow .fl-sum{display:flex;justify-content:space-between;padding:.3rem 0}
+#hsflow .fl-sum.total{font-weight:700;font-size:1.15rem;border-top:1px solid #d6d6d2;margin-top:.4rem;padding-top:.7rem}
+#hsflow .fl-btn{display:block;width:100%;font:inherit;font-weight:650;border:0;border-radius:8px;padding:.85rem 1rem;background:#111;color:#fff;cursor:pointer}
+#hsflow .fl-btn:hover{background:#333}
+#hsflow .fl-btn[disabled]{opacity:.45;cursor:not-allowed}
+#hsflow .fl-btn.ghost{background:#fff;color:#111;border:1.5px solid #111}
+#hsflow .fl-err{color:#B00020;min-height:1.3em;margin:.4rem 0 0;font-size:.95rem}
+#hsflow .fl-hint{background:#FFF3C4;border:1px solid #C9A227;border-radius:8px;padding:.6rem .8rem;font-size:.92rem;margin-bottom:.9rem}
+#hsflow .fl-pick{display:flex;gap:.6rem;align-items:flex-start;padding:.7rem .8rem;border:1.5px solid #1a73e8;border-radius:8px;background:#f4f8ff}
+#hsflow .fl-captcha{display:inline-flex;align-items:center;gap:.8rem;border:1px solid #d3d3d3;background:#f9f9f9;border-radius:4px;padding:.8rem 1rem;box-shadow:0 0 4px rgba(0,0,0,.08);margin:.2rem 0 1rem;min-width:16rem}
+#hsflow .fl-captcha .box{width:1.6rem;height:1.6rem;border:2px solid #c1c1c1;background:#fff;border-radius:3px;display:grid;place-items:center;cursor:pointer;font-size:1rem;color:#1a8a3a}
+#hsflow .fl-captcha .spin{width:1.2rem;height:1.2rem;border:3px solid #ddd;border-top-color:#4a90e2;border-radius:50%;animation:fl-spin .8s linear infinite}
+#hsflow .fl-captcha small{margin-left:auto;color:#777;font-size:.7rem;text-align:right}
+@keyframes fl-spin{to{transform:rotate(360deg)}}
+#hsflow .fl-done{text-align:center;padding:2rem 1rem}
+#hsflow .fl-done .tick{width:3.5rem;height:3.5rem;border-radius:50%;background:#1a8a3a;color:#fff;display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem}
+@media(prefers-reduced-motion:reduce){#hsflow .fl-captcha .spin{animation:none}}

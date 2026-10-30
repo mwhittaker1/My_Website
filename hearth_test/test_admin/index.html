@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<script src="../js/connect.js"></script>
+<title>Test admin | Hearth and Soul (TEST SITE)</title>
+<style>
+:root{--ink:#2a1a0c;--muted:#6b5440;--line:#e1d3bb;--bg:#faf6ee;--brand:#603820;--danger:#b00020;--warn:#fff3c4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.flag{background:var(--danger);color:#fff;text-align:center;padding:.5rem 1rem;font-weight:700}
+main{max-width:46rem;margin:0 auto;padding:1.25rem 1rem 4rem}
+h1{font-size:1.6rem;margin:.5rem 0}
+h2{font-size:1.15rem;margin:0 0 .6rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;margin:1rem 0}
+.note{background:var(--warn);border:1px solid #c9a227;border-radius:10px;padding:.7rem .9rem;font-size:.95rem}
+.muted{color:var(--muted);font-size:.93rem}
+table{border-collapse:collapse;width:100%}
+td,th{padding:.35rem .4rem;text-align:left;vertical-align:middle}
+input[type=time],input[type=number],input[type=date],input[type=url],input[type=text],select{font:inherit;padding:.4rem .55rem;border:1.5px solid #9a8a72;border-radius:8px;background:#fff;color:var(--ink)}
+input[type=url],input[type=text]{width:100%}
+label.row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:.5rem 0}
+button{font:inherit;padding:.5rem 1rem;border-radius:999px;border:1.5px solid var(--brand);background:#fff;color:var(--brand);cursor:pointer}
+button.primary{background:var(--brand);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.8rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.6rem 0;padding:0;list-style:none}
+.chips li{display:inline-flex;align-items:center;gap:.4rem;background:#f3e9d6;border-radius:999px;padding:.2rem .3rem .2rem .7rem}
+.chips button{padding:0 .5rem;border-radius:999px;line-height:1.6}
+.err{color:var(--danger);min-height:1.3em;margin:.4rem 0}
+.ok{color:#1a6b2c}
+ol.slots{margin:.4rem 0 0;padding-left:1.2rem}
+a{color:var(--brand)}
+</style>
+</head>
+<body>
+<div class="flag">TEST SITE: admin for pickup windows and blackout dates</div>
+<main>
+  <p><a href="../">← Back to the test page</a> · <a href="../test_submissions/">Test submissions</a> · <a href="../release-notes.html">What’s real and what’s not</a></p>
+  <h1>Test admin</h1>
+  <p class="note"><strong>Read this first.</strong> Changes here are saved <em>in this browser only</em>, and the test page picks them up in this same browser. Nobody else sees them, and the live bakery is not affected. This page has no password. To make a change permanent for everyone, press <strong>Download settings.json</strong> and send the file to be committed as <code>site/data/settings.json</code>.</p>
+
+  <section class="card" aria-labelledby="h-hours">
+    <h2 id="h-hours">Pickup hours</h2>
+    <p class="muted">Pickup windows are built from these hours, in Eastern time. Uncheck a day to close it.</p>
+    <table><tbody id="hours"></tbody></table>
+    <label class="row">Pickup window length
+      <select id="slotMinutes"><option value="30">30 minutes</option><option value="60">1 hour</option><option value="120">2 hours</option></select>
+    </label>
+  </section>
+
+  <section class="card" aria-labelledby="h-rules">
+    <h2 id="h-rules">Ordering rules</h2>
+    <label class="row">Minimum notice <input type="number" id="leadHours" min="0" max="336" inputmode="numeric"> hours</label>
+    <label class="row">Customers can book up to <input type="number" id="maxDays" min="1" max="60" inputmode="numeric"> days ahead</label>
+  </section>
+
+  <section class="card" aria-labelledby="h-black">
+    <h2 id="h-black">Blackout dates</h2>
+    <p class="muted">No pickups on these dates (holidays, market closures). Orders already placed are not changed.</p>
+    <label class="row">Add a date <input type="date" id="boDate"> <button type="button" id="boAdd">Add</button></label>
+    <ul class="chips" id="boList" aria-label="Blackout dates"></ul>
+    <p class="muted" id="boEmpty">No blackout dates.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-conn">
+    <h2 id="h-conn">Connections (optional)</h2>
+    <label>Shared service URL <span class="muted">(the test server sets this for you. Empty means the saved snapshot and this browser's log only.)</span>
+      <input type="url" id="apiBase" placeholder="(set automatically by the local server)" autocomplete="off"></label>
+    <label class="row">Estimated tax rate used on the fake checkout <input type="number" id="testTaxRate" min="0" max="0.2" step="0.005"></label>
+  </section>
+
+  <section class="card" aria-labelledby="h-prev">
+    <h2 id="h-prev">Preview: next bookable windows</h2>
+    <p class="muted" id="clockLine"></p>
+    <ol class="slots" id="preview"></ol>
+  </section>
+
+  <p class="err" id="errors" role="alert"></p>
+  <div class="actions">
+    <button type="button" class="primary" id="save">Save in this browser</button>
+    <button type="button" id="reset">Reset to published settings</button>
+    <button type="button" id="download">Download settings.json</button>
+    <label class="row" style="margin:0"><button type="button" id="importBtn">Import settings.json</button><input type="file" id="importFile" accept="application/json,.json" hidden></label>
+  </div>
+  <p class="muted" id="status" role="status"></p>
+</main>
+
+<script type="module">
+import { buildSlots, validateSettings } from "../js/pickup.js";
+
+const $ = (id) => document.getElementById(id);
+const DAY = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const ORDER = [1, 2, 3, 4, 5, 6, 0];
+const KEY = "hs-admin-settings";
+const FIELDS = ["timezone", "leadHours", "maxDays", "slotMinutes", "hours", "blackoutDates", "apiBase", "testTaxRate"];
+
+let published = {};
+let s = {};
+
+const toTime = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+const fromTime = (v) => { const m = /^(\d{2}):(\d{2})$/.exec(v); return m ? +m[1] * 60 + +m[2] : null; };
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const pick = (o) => Object.fromEntries(FIELDS.filter((k) => o[k] !== undefined).map((k) => [k, o[k]]));
+// A relative "/api" or a temporary tunnel address only means something right now, so it is never published.
+const forPublish = (o) => { const p = pick(o); if (/^\//.test(String(p.apiBase ?? "")) || /trycloudflare\.com/.test(String(p.apiBase ?? ""))) p.apiBase = ""; return p; };
+
+function readOverride() {
+  try { const o = JSON.parse(localStorage.getItem(KEY)); return o && typeof o === "object" ? o : null; } catch { return null; }
+}
+function say(msg, ok = false) { const el = $("status"); el.textContent = msg; el.className = "muted" + (ok ? " ok" : ""); }
+
+function renderHours() {
+  const body = $("hours");
+  body.innerHTML = "";
+  for (const d of ORDER) {
+    const h = s.hours[d] ?? null;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><label><input type="checkbox" data-d="${d}" ${h ? "checked" : ""}> ${DAY[d]}</label></td>` +
+      (h
+        ? `<td><input type="time" data-d="${d}" data-k="0" aria-label="${DAY[d]} opens" value="${toTime(h[0])}"> to <input type="time" data-d="${d}" data-k="1" aria-label="${DAY[d]} closes" value="${toTime(h[1])}"></td>`
+        : `<td class="muted">Closed</td>`);
+    body.appendChild(tr);
+  }
+}
+
+function renderBlackouts() {
+  const list = $("boList");
+  list.innerHTML = "";
+  for (const d of [...s.blackoutDates].sort()) {
+    const li = document.createElement("li");
+    const [y, m, day] = d.split("-").map(Number);
+    li.append(new Date(Date.UTC(y, m - 1, day, 12)).toLocaleDateString("en-US", { timeZone: "UTC", weekday: "short", month: "short", day: "numeric", year: "numeric" }));
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = "×"; b.setAttribute("aria-label", "Remove " + d); b.dataset.date = d;
+    li.appendChild(b);
+    list.appendChild(li);
+  }
+  $("boEmpty").hidden = s.blackoutDates.length > 0;
+}
+
+function renderFields() {
+  $("slotMinutes").value = String(s.slotMinutes);
+  $("leadHours").value = s.leadHours;
+  $("maxDays").value = s.maxDays;
+  $("apiBase").value = s.apiBase ?? "";
+  $("testTaxRate").value = s.testTaxRate ?? 0.08;
+}
+
+function nowMs() {
+  try { const f = localStorage.getItem("hs-fake-now"); if (f && isFinite(+f)) return +f; } catch {}
+  return Date.now();
+}
+
+function renderPreview() {
+  const errs = validateSettings(s);
+  $("errors").textContent = errs.join(" ");
+  $("save").disabled = errs.length > 0;
+  const now = nowMs();
+  const fake = (() => { try { return !!localStorage.getItem("hs-fake-now"); } catch { return false; } })();
+  $("clockLine").textContent = (fake ? "Using the test clock from the test page: " : "Using the real time: ") +
+    new Date(now).toLocaleString("en-US", { timeZone: s.timezone, dateStyle: "medium", timeStyle: "short" }) + " Eastern.";
+  const ol = $("preview");
+  ol.innerHTML = "";
+  if (errs.length) return;
+  const picks = [];
+  for (const day of buildSlots(now, s).days) for (const sl of day.slots) if (sl.ok && picks.length < 8) picks.push(sl);
+  for (const sl of picks) {
+    const li = document.createElement("li");
+    const f = (o) => new Date(sl.start).toLocaleString("en-US", { timeZone: s.timezone, ...o });
+    li.textContent = `${f({ weekday: "short", month: "short", day: "numeric" })}, ${f({ hour: "numeric", minute: "2-digit" })}`;
+    ol.appendChild(li);
+  }
+  if (!picks.length) ol.innerHTML = "<li>No bookable windows with these settings.</li>";
+}
+
+function renderAll() { renderHours(); renderBlackouts(); renderFields(); renderPreview(); }
+function changed() { renderPreview(); say(""); }
+
+$("hours").addEventListener("change", (e) => {
+  const t = e.target, d = +t.dataset.d;
+  if (t.type === "checkbox") { s.hours[d] = t.checked ? [540, 1020] : null; renderHours(); }
+  else { const v = fromTime(t.value); if (v !== null && s.hours[d]) s.hours[d][+t.dataset.k] = v; }
+  changed();
+});
+$("slotMinutes").addEventListener("change", (e) => { s.slotMinutes = +e.target.value; changed(); });
+$("leadHours").addEventListener("input", (e) => { const v = parseInt(e.target.value, 10); if (v >= 0) s.leadHours = v; changed(); });
+$("maxDays").addEventListener("input", (e) => { const v = parseInt(e.target.value, 10); if (v >= 1) s.maxDays = v; changed(); });
+$("apiBase").addEventListener("input", (e) => { s.apiBase = e.target.value.trim().replace(/\/+$/, ""); say(""); });
+$("testTaxRate").addEventListener("input", (e) => { const v = parseFloat(e.target.value); if (v >= 0 && v <= 0.2) s.testTaxRate = v; say(""); });
+
+$("boAdd").addEventListener("click", () => {
+  const v = $("boDate").value;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { $("errors").textContent = "Pick a date to add."; return; }
+  if (!s.blackoutDates.includes(v)) s.blackoutDates.push(v);
+  $("boDate").value = "";
+  renderBlackouts(); changed();
+});
+$("boList").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-date]");
+  if (!b) return;
+  s.blackoutDates = s.blackoutDates.filter((d) => d !== b.dataset.date);
+  renderBlackouts(); changed();
+});
+
+$("save").addEventListener("click", () => {
+  try { localStorage.setItem(KEY, JSON.stringify(pick(s))); say("Saved in this browser. Open the test page to try it.", true); }
+  catch { say("Couldn’t save: this browser is blocking site storage."); }
+});
+$("reset").addEventListener("click", () => {
+  try { localStorage.removeItem(KEY); } catch {}
+  s = clone(published); renderAll(); say("Reset to the published settings.", true);
+});
+$("download").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(forPublish(s), null, 2) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "settings.json"; a.click();
+  URL.revokeObjectURL(a.href);
+});
+$("importBtn").addEventListener("click", () => $("importFile").click());
+$("importFile").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const o = JSON.parse(await f.text());
+    const next = { ...clone(s), ...pick(o) };
+    const errs = validateSettings(next);
+    if (errs.length) { say("That file isn’t valid: " + errs.join(" ")); return; }
+    s = next; renderAll(); say("Imported. Press Save to keep it in this browser.", true);
+  } catch { say("That file couldn’t be read as settings."); }
+  e.target.value = "";
+});
+
+(async () => {
+  try { published = await (await fetch("../data/settings.json", { cache: "no-cache" })).json(); } catch { published = {}; }
+  published = { timezone: "America/New_York", leadHours: 24, maxDays: 14, slotMinutes: 60, hours: {}, blackoutDates: [], ...published };
+  s = clone({ ...published, ...(readOverride() ?? {}) });
+  s.blackoutDates = [...(s.blackoutDates ?? [])];
+  renderAll();
+  if (readOverride()) say("Showing settings saved in this browser.");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-10-30T21:06:12.567Z",
+  "currency": "USD",
+  "categories": [
+    "Bread",
+    "Catering",
+    "Holiday"
+  ],
+  "items": [
+    {
+      "id": "CHLLH-PLN",
+      "skuId": "019f815c-520b-771a-a47f-9cd237cdd08c",
+      "name": "Challah",
+      "note": "",
+      "image": null,
+      "price": 9.75,
+      "category": "Bread"
+    },
+    {
+      "id": "CNN-RLL-FCCC",
+      "skuId": "01a14435-9330-7085-ad32-8381a0bbfd6f",
+      "name": "Cinnamon Roll Focaccia",
+      "note": "",
+      "image": null,
+      "price": 10.75,
+      "category": "Bread"
+    },
+    {
+      "id": "CNN-RLL-FC-HLF",
+      "skuId": "01a14436-3be8-71f8-bceb-af614368d7df",
+      "name": "Cinnamon Roll Focaccia Half",
+      "note": "",
+      "image": null,
+      "price": 6.75,
+      "category": "Bread"
+    },
+    {
+      "id": "2-DZN-SM-CKS",
+      "skuId": "01a08bcd-e91b-77bb-88e8-3f46a55abe60",
+      "name": "2 Dozen Sm Cookies",
+      "note": "",
+      "image": null,
+      "price": 30,
+      "category": "Catering"
+    },
+    {
+      "id": "LG-PRTY-TRY-CKS",
+      "skuId": "01a0f7d5-278f-7094-ae1b-6b9df4db4299",
+      "name": "Large Party Tray Cookies",
+      "note": "",
+      "image": null,
+      "price": 65,
+      "category": "Catering"
+    },
+    {
+      "id": "DZN-CKS",
+      "skuId": "01a067d2-5f11-7208-a04b-5ed96a8655e5",
+      "name": "Dozen Cookies",
+      "note": "",
+      "image": null,
+      "price": 35,
+      "category": "Holiday"
+    },
+    {
+      "id": "PCN-P",
+      "skuId": "01a18433-18f2-7098-973c-fe6eace37a78",
+      "name": "Pecan Pie",
+      "note": "",
+      "image": null,
+      "price": 20,
+      "category": "Holiday"
+    },
+    {
+      "id": "PMPKN-P",
+      "skuId": "01a18432-a20b-764c-b8a9-9868b82cc322",
+      "name": "Pumpkin Pie",
+      "note": "",
+      "image": null,
+      "price": 18,
+      "category": "Holiday"
+    }
+  ]
+}
