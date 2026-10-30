@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Hearth and Soul Bakery (TEST SITE)</title>
+<meta name="description" content="Handmade breads and treats in Chestnut Hill, Philadelphia. Order for pickup at the Market at the Fareway.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Lobster+Two:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF6EE;
+  --ink:#33200F;
+  --muted:#6B5440;
+  --brand:#603820;
+  --gold:#E0A858;
+  --line:#E4D6BF;
+  --paper:#FFFDF8;
+  --frame:#603820;
+  --band:#33200F;
+  --band-ink:#FAF1DF;
+  --band-muted:#D9C3A0;
+  --band-line:#5A3F26;
+  --btn-bg:#603820;
+  --btn-ink:#FFF8EA;
+  --danger:#B8432B;
+  --hdr:64px;
+  --display:"Lobster Two","Brush Script MT","Segoe Script",cursive;
+  --text:"Alegreya",Georgia,"Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1D130B;--ink:#F6EAD6;--muted:#CDB896;--brand:#E0A858;--line:#43301E;
+    --paper:#FFFDF8;--frame:#E0A858;--band:#2E1D0F;--band-ink:#FAF1DF;--band-muted:#D9C3A0;--band-line:#5A3F26;
+    --btn-bg:#E0A858;--btn-ink:#2A1708;--danger:#F08B72;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1D130B;--ink:#F6EAD6;--muted:#CDB896;--brand:#E0A858;--line:#43301E;
+  --paper:#FFFDF8;--frame:#E0A858;--band:#2E1D0F;--band-ink:#FAF1DF;--band-muted:#D9C3A0;--band-line:#5A3F26;
+  --btn-bg:#E0A858;--btn-ink:#2A1708;--danger:#F08B72;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hdr) + env(safe-area-inset-top,0px) + 8px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--text);font-size:1.125rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1120px;margin-inline:auto;padding-inline:clamp(1rem,4vw,2rem)}
+
+h1,h2{font-family:var(--display);font-style:italic;font-weight:700;line-height:1.08;margin:0;color:var(--brand);letter-spacing:.005em}
+h1{font-size:clamp(2.6rem,6.4vw,4.7rem)}
+h2{font-size:clamp(2.1rem,4.4vw,3.1rem)}
+h3{font-family:var(--text);font-weight:700;font-size:1.3rem;line-height:1.25;margin:0 0 .5rem}
+p{margin:0 0 1rem}
+
+/* header */
+.site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);border-bottom:1px solid var(--line)}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:var(--hdr)}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none}
+.brand img{width:52px;height:auto}
+.brand span{font-family:var(--display);font-style:italic;font-weight:700;font-size:1.7rem;color:var(--brand);line-height:1}
+.nav{display:flex;gap:clamp(.9rem,3vw,1.9rem);align-items:center}
+.nav a{text-decoration:none;font-weight:500;padding:.35rem 0;border-bottom:2px solid transparent}
+.nav a:hover{border-bottom-color:var(--gold)}
+.nav a.nav-order{font-weight:700;border-bottom-color:var(--gold)}
+@media (max-width:560px){.brand span{font-size:1.35rem}.brand img{width:42px}.nav a.hide-sm{display:none}}
+
+/* buttons */
+.btn{display:inline-block;font:inherit;font-weight:700;text-decoration:none;cursor:pointer;border-radius:999px;padding:.8rem 1.5rem;border:2px solid transparent;line-height:1.2}
+.btn-primary{background:var(--btn-bg);color:var(--btn-ink)}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{border-color:var(--brand);color:var(--brand);background:transparent}
+.btn-ghost:hover{background:color-mix(in srgb,var(--brand) 10%,transparent)}
+
+/* hero */
+.hero{padding-block:clamp(2rem,6vw,5rem)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(1.5rem,5vw,4rem);align-items:center}
+.notice{display:inline-block;margin:0 0 1.25rem;padding:.3rem .95rem;border:1.5px solid var(--brand);border-radius:999px;font-weight:700;font-size:1rem;color:var(--brand)}
+.hero h1{margin-bottom:1.25rem}
+.lede{font-size:clamp(1.15rem,2.2vw,1.35rem);max-width:34rem;color:var(--ink)}
+.cta-row{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.75rem}
+.plate{margin:0;background:var(--paper);border:3px solid var(--frame);border-radius:44px;padding:clamp(1rem,3vw,2rem);transform:rotate(-2deg);box-shadow:0 14px 0 -8px color-mix(in srgb,var(--frame) 25%,transparent)}
+.plate img{width:100%}
+@media (prefers-reduced-motion:no-preference){
+  .plate{animation:settle .9s cubic-bezier(.2,.8,.25,1) both}
+  @keyframes settle{from{opacity:0;transform:translateY(-22px) rotate(-6deg)}to{opacity:1;transform:rotate(-2deg)}}
+}
+@media (max-width:820px){.hero .wrap{grid-template-columns:1fr}.plate{max-width:460px;justify-self:center}}
+
+/* order band */
+.band{background:var(--band);color:var(--band-ink);padding-block:clamp(3rem,7vw,5.5rem)}
+.band h2{color:var(--gold)}
+.band a{color:var(--gold)}
+.order-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2rem;align-items:center;margin-bottom:2.5rem}
+.order-head p{max-width:40rem;color:var(--band-muted);font-size:1.2rem;margin:.9rem 0 0}
+.order-head img{width:clamp(110px,16vw,190px);transform:rotate(8deg)}
+@media (max-width:640px){.order-head{grid-template-columns:1fr}.order-head img{display:none}}
+.order-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(2rem,5vw,4rem)}
+@media (max-width:900px){.order-grid{grid-template-columns:1fr}}
+.band h3{color:var(--band-ink)}
+.fine{font-size:.95rem;color:var(--band-muted);margin:.25rem 0 1rem}
+.menu{list-style:none;margin:0;padding:0;border-top:1px solid var(--band-line)}
+.menu li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:1rem;align-items:center;padding:1rem 0;border-bottom:1px solid var(--band-line)}
+.menu .name{font-weight:700;font-size:1.15rem;line-height:1.25}
+.menu .note{display:block;font-size:.98rem;color:var(--band-muted);font-weight:400}
+.menu .price{font-variant-numeric:tabular-nums}
+@media (max-width:430px){.menu li{grid-template-columns:minmax(0,1fr) auto}.menu .stepper{grid-column:1/-1;justify-self:start}}
+.stepper{display:flex;align-items:center;gap:.4rem}
+.stepper button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--band-muted);background:transparent;color:var(--band-ink);font:inherit;font-size:1.3rem;line-height:1;cursor:pointer}
+.stepper button:hover:not(:disabled){background:var(--gold);border-color:var(--gold);color:#2A1708}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper output{min-width:1.6rem;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.earliest{font-size:1.2rem;margin:0 0 .35rem}
+.earliest strong{color:var(--gold)}
+.why{font-size:.98rem;color:var(--band-muted);margin-bottom:1.25rem}
+.days{display:flex;gap:.5rem;overflow-x:auto;padding:.25rem .1rem .75rem;margin-bottom:.75rem;scroll-snap-type:x proximity}
+.chip{flex:0 0 auto;scroll-snap-align:start;min-width:4.6rem;padding:.55rem .6rem;border:1.5px solid var(--band-line);border-radius:14px;background:transparent;color:var(--band-ink);font:inherit;text-align:center;cursor:pointer;line-height:1.2}
+.chip .dow{display:block;font-size:.95rem}
+.chip .num{display:block;font-weight:700;font-size:1.35rem}
+.chip .why-not{display:block;font-size:.8rem;color:var(--band-muted);min-height:1em}
+.chip:hover:not(:disabled){border-color:var(--gold)}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#2A1708}
+.chip[aria-pressed="true"] .why-not{color:#4A2E14}
+.chip:disabled{opacity:.5;cursor:not-allowed}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:.6rem;min-height:3rem}
+.slot{padding:.65rem .5rem;border:1.5px solid var(--band-line);border-radius:12px;background:transparent;color:var(--band-ink);font:inherit;font-weight:500;cursor:pointer;font-variant-numeric:tabular-nums}
+.slot:hover:not(:disabled){border-color:var(--gold)}
+.slot[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#2A1708;font-weight:700}
+.slot:disabled{opacity:.38;cursor:not-allowed}
+.empty{grid-column:1/-1;color:var(--band-muted);margin:0}
+.tester{margin-top:1.5rem;border-top:1px solid var(--band-line);padding-top:1rem}
+.tester summary{cursor:pointer;font-weight:700}
+.tester .row{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.9rem 0 .5rem}
+.tester label{font-size:.98rem;color:var(--band-muted)}
+.tester input[type="datetime-local"]{font:inherit;padding:.45rem .6rem;border-radius:8px;border:1.5px solid var(--band-line);background:transparent;color:var(--band-ink);color-scheme:dark}
+.mini{font:inherit;font-size:.95rem;padding:.4rem .85rem;border-radius:999px;border:1.5px solid var(--band-muted);background:transparent;color:var(--band-ink);cursor:pointer}
+.mini:hover{background:var(--gold);border-color:var(--gold);color:#2A1708}
+.summary{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem 2rem;margin-top:.5rem;padding-top:1.5rem;border-top:1px solid var(--band-line)}
+.summary p{margin:0}
+.summary .sum-line{font-size:1.2rem}
+.summary .btn{background:var(--gold);color:#2A1708}
+.summary .btn:disabled{opacity:.4;cursor:not-allowed}
+.demo-msg{grid-column:1/-1;margin:0;color:var(--gold);min-height:1.5em}
+
+.editor{margin-top:1.5rem;border-top:1px solid var(--band-line);padding-top:1rem}
+.editor summary{cursor:pointer;font-weight:700}
+.editor .row{margin:.9rem 0 .5rem}
+.hrs{display:grid;grid-template-columns:minmax(8.5rem,auto) 1fr;gap:.55rem 1rem;align-items:center;margin:1rem 0 .5rem}
+.hrs .day{display:flex;align-items:center;gap:.55rem;font-weight:500}
+.hrs .day input{width:1.1rem;height:1.1rem;accent-color:var(--gold)}
+.hrs .times{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.hrs input[type="time"],.rules input,.rules select{font:inherit;padding:.4rem .55rem;border-radius:8px;border:1.5px solid var(--band-line);background:transparent;color:var(--band-ink);color-scheme:dark}
+.rules{display:flex;flex-wrap:wrap;gap:.8rem 1.75rem;margin:1rem 0 .25rem}
+.rules label{display:flex;align-items:center;gap:.5rem;font-size:1rem}
+.rules input[type="number"]{width:5rem}
+/* news */
+section.pad{padding-block:clamp(3rem,7vw,5.5rem)}
+.news-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(2rem,5vw,4rem);align-items:center;margin-top:2rem}
+@media (max-width:820px){.news-grid{grid-template-columns:1fr}}
+.news-grid .copy p{max-width:34rem}
+.link-big{font-weight:700;color:var(--brand)}
+.announce{margin:0;border:3px solid var(--frame);border-radius:44px;overflow:hidden;background:var(--paper);max-width:420px;justify-self:center}
+.announce figcaption{padding:.7rem 1.2rem 1rem;font-size:.98rem;color:#5A4430;background:var(--paper);text-align:center}
+.testi{margin-top:3rem;padding-top:1.75rem;border-top:1px solid var(--line)}
+.testi p{color:var(--muted);margin:0}
+
+/* contact */
+.contact{border-top:1px solid var(--line)}
+.contact-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(2rem,5vw,4rem);align-items:start}
+@media (max-width:820px){.contact-grid{grid-template-columns:1fr}}
+.contact .side p{max-width:26rem;margin-top:1rem}
+.field{margin-bottom:1.1rem}
+.field label{font-weight:700;display:block}
+.field label .opt{font-weight:400;color:var(--muted)}
+.field input,.field select,.field textarea{display:block;width:100%;margin-top:.35rem;font:inherit;font-weight:400;padding:.7rem .9rem;border-radius:12px;border:1.5px solid color-mix(in srgb,var(--ink) 40%,transparent);background:var(--paper);color:#33200F}
+.field textarea{resize:vertical;min-height:9rem}
+.field [aria-invalid="true"],.check [aria-invalid="true"]{border-color:var(--danger);outline:2px solid var(--danger);outline-offset:1px}
+.err{margin:.35rem 0 0;color:var(--danger);font-size:.98rem}
+.err:empty{display:none}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.check{display:flex;gap:.6rem;align-items:flex-start;margin:.25rem 0 .25rem}
+.check input{flex:0 0 auto;width:1.2rem;height:1.2rem;margin-top:.3rem;accent-color:var(--brand)}
+#cConsentErr{margin:0 0 1rem}
+.result{margin-top:1.5rem;padding:1.25rem 1.4rem;border:2px solid var(--frame);border-radius:20px;background:var(--paper);color:#33200F}
+.result:empty{display:none}
+.result:focus{outline:none}
+.result h3{margin:0 0 .5rem;color:#33200F}
+.result p{margin:0 0 .5rem}
+.result textarea{display:block;width:100%;min-height:9rem;font:inherit;font-size:1rem;padding:.6rem .8rem;border-radius:10px;border:1.5px solid #D8C7AA;background:#fff;color:#33200F;margin:.5rem 0 1rem}
+.result .actions{display:flex;flex-wrap:wrap;gap:.6rem}
+.result .btn-primary{background:#603820;color:#FFF8EA}
+.result .btn-ghost{border-color:#603820;color:#603820}
+.result .fine-dark{margin:.75rem 0 0;font-size:.95rem;color:#5A4430}
+
+/* captcha */
+[hidden]{display:none !important}
+.captcha input{max-width:14rem}
+.cap-row{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin:.4rem 0 .5rem}
+#cCanvas{width:220px;max-width:100%;height:auto;border:1.5px solid color-mix(in srgb,var(--ink) 40%,transparent);border-radius:12px;background:#FFFDF8}
+.cap-q{margin:0;font-weight:700;font-size:1.2rem}
+.cap-actions{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem}
+.link-btn{background:none;border:0;padding:.15rem 0;font:inherit;font-size:.98rem;color:var(--brand);text-decoration:underline;cursor:pointer}
+
+/* visit */
+.visit{border-top:1px solid var(--line)}
+.visit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,5vw,4rem);margin-top:2rem}
+@media (max-width:820px){.visit-grid{grid-template-columns:1fr}}
+address{font-style:normal;margin-bottom:1.25rem}
+.contact-list{list-style:none;margin:0 0 1.5rem;padding:0}
+.contact-list li{padding:.3rem 0}
+.hours{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1.5rem;margin:0}
+.hours dt{font-weight:700}
+.hours dd{margin:0;font-variant-numeric:tabular-nums}
+.join h3{font-size:1.6rem}
+.join form{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
+.join input[type="email"]{flex:1 1 14rem;font:inherit;padding:.75rem 1rem;border-radius:999px;border:1.5px solid var(--brand);background:var(--paper);color:#33200F}
+.join .msg{min-height:1.6em;margin:.75rem 0 0;color:var(--brand);font-weight:700}
+.join img{width:150px;margin-top:1.5rem;transform:rotate(-6deg)}
+
+/* footer */
+.site-footer{background:var(--band);color:var(--band-ink);padding-block:3rem}
+.site-footer .wrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2rem;align-items:center}
+.site-footer img{width:150px;filter:invert(1) sepia(.35) saturate(1.1);opacity:.92}
+.site-footer p{margin:0 0 .3rem}
+.site-footer .small{font-size:.95rem;color:var(--band-muted);max-width:44rem}
+.site-footer a{color:var(--gold)}
+@media (max-width:560px){.site-footer .wrap{grid-template-columns:1fr}}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+<link rel="stylesheet" href="css/test-mode.css">
+<script src="js/connect.js"></script>
+</head>
+<body>
+<div id="testbar" role="region" aria-label="Test controls">
+  <div class="tb-row">
+    <strong class="tb-flag">TEST SITE</strong>
+    <span>Not the live bakery site. No real orders or payments.</span>
+    <a href="release-notes.html">What’s real and what’s not</a>
+    <a href="test_admin/">Test admin</a>
+    <a href="test_submissions/">Test submissions</a>
+  </div>
+  <div class="tb-row tb-clock">
+    <label for="fakeNow">Set a date and time to test from <span class="tb-sub">(Eastern)</span></label>
+    <input type="datetime-local" id="fakeNow">
+    <button type="button" class="tb-btn" id="useReal">Use real time</button>
+    <span class="tb-presets" id="presets">
+      <button type="button" class="tb-btn" data-dow="3" data-h="10" data-m="20">Wed 10:20 AM</button>
+      <button type="button" class="tb-btn" data-dow="5" data-h="21" data-m="0">Fri 9:00 PM</button>
+      <button type="button" class="tb-btn" data-dow="6" data-h="15" data-m="30">Sat 3:30 PM</button>
+      <button type="button" class="tb-btn" data-dow="0" data-h="12" data-m="30">Sun 12:30 PM</button>
+      <button type="button" class="tb-btn" data-dow="1" data-h="10" data-m="0">Mon 10:00 AM</button>
+    </span>
+  </div>
+  <div class="tb-row tb-note"><span id="clockNote" aria-live="polite"></span> <span id="overrideNote" hidden></span></div>
+</div>
+
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Hearth and Soul Bakery, home">
+      <img src="assets/img-1.webp" alt="" width="52" height="35">
+      <span>Hearth and Soul</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="nav-order" href="#order">Order pickup</a>
+      <a class="hide-sm" href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a href="#visit">Visit</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="notice">Now open at the Market at the Fareway</p>
+        <h1 id="hero-title">Handmade breads and treats, baked from scratch.</h1>
+        <p class="lede">Hearth and Soul makes artisanal breads and delightful treats from fresh, high-quality ingredients, lovingly handmade in Chestnut Hill.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#order">Order for pickup</a>
+          <a class="btn btn-ghost" href="#visit">Find the bakery</a>
+        </div>
+      </div>
+      <figure class="plate">
+        <img src="assets/img-2.webp" width="820" height="619" alt="Hearth and Soul logo: a heart-shaped chocolate chunk cookie beside a braided, heart-shaped golden loaf">
+      </figure>
+    </div>
+  </section>
+
+  <section class="band" id="order" aria-labelledby="order-title">
+    <div class="wrap">
+      <div class="order-head">
+        <div>
+          <h2 id="order-title">Order for pickup</h2>
+          <p>Choose your items, then pick a time. The earliest pickup is <span id="leadText">24</span> hours from now or the next time we’re open, whichever is later. You can book up to <span id="maxDaysText">14</span> days ahead.</p>
+        </div>
+        <img src="assets/img-3.webp" alt="" width="190" height="168">
+      </div>
+
+      <div class="order-grid">
+        <div class="order-menu">
+          <h3>Choose your items</h3>
+          <div class="menu-tools">
+            <button type="button" class="mini" id="refreshCatalog">Refresh catalogue</button>
+            <span class="fine" id="catalogStatus" role="status"></span>
+          </div>
+
+          <ul class="menu" id="menu"></ul>
+        </div>
+
+        <div class="order-when">
+          <h3>Choose a pickup time</h3>
+          <p class="earliest" id="earliest" aria-live="polite"></p>
+          <p class="why" id="why"></p>
+          <div class="days" id="days" role="group" aria-label="Pickup day"></div>
+          <div class="slots" id="slots" role="group" aria-label="Pickup time"></div>
+          <p class="fine" style="margin-top:.9rem">All times are Eastern.</p>
+
+          </div>
+
+        <div class="summary">
+          <p class="sum-line" id="sumLine" aria-live="polite"></p>
+          <button type="button" class="btn" id="reserve" disabled>View cart &amp; checkout</button>
+        </div>
+        <p class="demo-msg" id="demoMsg" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" id="news" aria-labelledby="news-title">
+    <div class="wrap">
+      <h2 id="news-title">Featured in the Chestnut Hill Local</h2>
+      <div class="news-grid">
+        <div class="copy">
+          <p>Sam sat down with Jeff Meade from the Chestnut Hill Local to talk about his background and his plans for the bakery.</p>
+          <p><a class="link-big" href="https://chestnuthilllocal.com/stories/it-pro-plans-new-bakery-pursuing-sweet-dreams,41241" target="_blank" rel="noopener">Read the article</a></p>
+        </div>
+        <figure class="announce">
+          <img src="assets/img-4.webp" width="640" height="564" alt="Grand opening announcement for Hearth and Soul at the Market at the Fareway, 8221 Germantown Avenue">
+          <figcaption>Our grand opening announcement</figcaption>
+        </figure>
+      </div>
+      <div class="testi">
+        <h3>Testimonials</h3>
+        <p>Kind words from neighbors will go here. Tried something you loved? Send a note to <a href="mailto:sales@hearthandsoulbakery.com">sales@hearthandsoulbakery.com</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap contact-grid">
+      <div class="side">
+        <h2 id="contact-title">Get in touch</h2>
+        <p>Questions about an order, pickup, or anything else? Send a note and we’ll reply by email.</p>
+        <p>Prefer to write directly? Email <a href="mailto:sales@hearthandsoulbakery.com">sales@hearthandsoulbakery.com</a> or call <a href="tel:+18144225379">(814) 4BAKERY</a>.</p>
+      </div>
+      <div>
+        <form id="contactForm" novalidate>
+          <div class="field">
+            <label for="cName">Your name</label>
+            <input id="cName" name="name" type="text" autocomplete="name" required aria-describedby="cNameErr">
+            <p class="err" id="cNameErr"></p>
+          </div>
+          <div class="field">
+            <label for="cEmail">Email</label>
+            <input id="cEmail" name="email" type="email" autocomplete="email" required aria-describedby="cEmailErr">
+            <p class="err" id="cEmailErr"></p>
+          </div>
+          <div class="field">
+            <label for="cPhone">Phone <span class="opt">(optional)</span></label>
+            <input id="cPhone" name="phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="cTopic">What’s this about?</label>
+            <select id="cTopic" name="topic">
+              <option>General question</option>
+              <option>An order or pickup</option>
+              <option>Catering or a large order</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cMsg">Message</label>
+            <textarea id="cMsg" name="message" rows="6" required aria-describedby="cMsgErr"></textarea>
+            <p class="err" id="cMsgErr"></p>
+          </div>
+          <div class="field hp" aria-hidden="true">
+            <label for="cWebsite">Leave this field empty</label>
+            <input id="cWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="field captcha">
+            <div id="cBuiltin">
+              <label for="cCaptcha" id="cCaptchaLabel">Type the characters you see</label>
+              <div class="cap-row">
+                <canvas id="cCanvas" width="440" height="128" role="img" aria-label="Characters to type. If you can’t read them, use a question instead."></canvas>
+                <p class="cap-q" id="cQuestion" hidden></p>
+                <div class="cap-actions">
+                  <button type="button" class="link-btn" id="cNew">New image</button>
+                  <button type="button" class="link-btn" id="cSwitch">Use a question instead</button>
+                </div>
+              </div>
+              <input id="cCaptcha" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="cCaptchaErr">
+            </div>
+            <div id="cProvider" hidden></div>
+            <p class="err" id="cCaptchaErr"></p>
+          </div>
+          <label class="check"><input type="checkbox" id="cConsent" aria-describedby="cConsentErr"> <span>I agree that Hearth and Soul may use this information to reply to me.</span></label>
+          <p class="err" id="cConsentErr"></p>
+          <button type="submit" class="btn btn-primary" id="cSend">Send message</button>
+        </form>
+        <div class="result" id="cResult" role="status"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad visit" id="visit" aria-labelledby="visit-title">
+    <div class="wrap">
+      <h2 id="visit-title">Visit Hearth and Soul</h2>
+      <div class="visit-grid">
+        <div>
+          <address>
+            <strong>The Market at the Fareway</strong><br>
+            8221 Germantown Ave.<br>
+            Philadelphia, PA 19118<br>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=8221+Germantown+Ave+Philadelphia+PA+19118" target="_blank" rel="noopener">Open in maps</a>
+          </address>
+          <ul class="contact-list">
+            <li><a href="tel:+18144225379">(814) 4BAKERY</a></li>
+            <li><a href="mailto:sales@hearthandsoulbakery.com">sales@hearthandsoulbakery.com</a></li>
+            <li><a href="https://www.facebook.com/hearthandsoulphilly" target="_blank" rel="noopener">Facebook</a> and <a href="https://www.instagram.com/hearthandsoulphilly" target="_blank" rel="noopener">@hearthandsoulphilly</a> on Instagram</li>
+          </ul>
+          <h3>Hours</h3>
+          <p class="fine" style="color:var(--muted)">Sample hours for this example. Change them under “Business hours and rules” in the order section; the pickup times follow.</p>
+          <dl class="hours" id="hours"></dl>
+        </div>
+
+        <div class="join">
+          <h3>Join our mailing list</h3>
+          <p>Get updates, exclusive offers, and news from the bakery.</p>
+          <form id="joinForm" novalidate>
+            <label class="sr" for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+            <button type="submit" class="btn btn-primary">Join the list</button>
+          </form>
+          <p class="msg" id="joinMsg" role="status"></p>
+          <img src="assets/img-3.webp" alt="" width="150" height="133">
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="assets/img-5.webp" alt="Hearth and Soul linocut-style logo" width="150" height="117">
+    <div>
+      <p><strong>Hearth and Soul Bakery</strong>, handmade breads and treats</p>
+      <p>8221 Germantown Ave., Philadelphia, PA 19118</p>
+      <p class="small">This is an example shell built from the bakery’s marketing materials. The menu, prices, hours, and pickup rules are placeholders for demonstration, and no orders are placed.</p>
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+import {buildSlots} from "./js/pickup.js";
+(function(){
+  "use strict";
+
+  /* ---- Pickup rules: change these to change the whole page ---- */
+  var TZ = "America/New_York";
+  var LEAD_HOURS = 24;          // minimum notice
+  var MAX_DAYS = 14;            // how far ahead people can book
+  var SLOT_MIN = 60;            // length of each pickup window, in minutes
+  // Hours by weekday (0 = Sunday) as minutes after midnight, e.g. 480 = 8:00 AM. null = closed.
+  var DEFAULTS = {lead:LEAD_HOURS, maxDays:MAX_DAYS, slot:SLOT_MIN, hours:{0:[600,840],1:null,2:null,3:null,4:[540,1020],5:[540,1020],6:[540,1020]}};
+  var HOURS;
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+  function applySettings(s){ LEAD_HOURS = s.lead; MAX_DAYS = s.maxDays; SLOT_MIN = s.slot; HOURS = s.hours; }
+  applySettings(clone(DEFAULTS));
+  var DAYNAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  var ITEMS = [], BLACKOUT = [], SETTINGS = {};
+
+  /* ---- Eastern-time helpers ---- */
+  var partsFmt = new Intl.DateTimeFormat("en-US",{timeZone:TZ,hourCycle:"h23",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric"});
+  var dayFmt = new Intl.DateTimeFormat("en-US",{timeZone:TZ,weekday:"short",month:"short",day:"numeric"});
+  function etParts(ms){
+    var o = {}, p = partsFmt.formatToParts(new Date(ms));
+    for (var i=0;i<p.length;i++){ if (p[i].type !== "literal") o[p[i].type] = +p[i].value; }
+    return o;
+  }
+  function offsetMs(ms){
+    var p = etParts(ms);
+    return Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute,p.second) - Math.floor(ms/1000)*1000;
+  }
+  function etToUtc(y,m,d,h,mi){
+    var g = Date.UTC(y,m-1,d,h,mi), o = offsetMs(g), t = g - o, o2 = offsetMs(t);
+    if (o2 !== o) t = g - o2;
+    return t;
+  }
+  function clock(ms){
+    var p = etParts(ms), h = p.hour % 12 || 12, ap = p.hour < 12 ? "AM" : "PM";
+    return h + (p.minute ? ":" + String(p.minute).padStart(2,"0") : "") + " " + ap;
+  }
+  function minLabel(m){ var h = Math.floor(m/60) % 24, mi = m % 60; return (h % 12 || 12) + (mi ? ":" + String(mi).padStart(2,"0") : "") + " " + (h < 12 ? "AM" : "PM"); }
+  function range(a,b){ return clock(a) + "\u2013" + clock(b); }
+  function money(n){ return "$" + n.toFixed(2); }
+
+  /* ---- State ---- */
+  var qty = {};
+  var fakeNow = null;          // ms, or null for real time
+  var dayIdx = null;           // selected day index
+  var slotStart = null;        // selected slot start (ms)
+  var model = null;
+
+  function nowMs(){ return fakeNow === null ? Date.now() : fakeNow; }
+
+  /* ---- The rule: earliest = later of (now + 24h) and the next open window ---- */
+  /* ---- The rule lives in js/pickup.js (shared with the tests). This adapts its output for the page. ---- */
+  function build(now){
+    var m = buildSlots(now, {timezone: TZ, leadHours: LEAD_HOURS, maxDays: MAX_DAYS, slotMinutes: SLOT_MIN, hours: HOURS, blackoutDates: BLACKOUT});
+    var days = m.days.map(function(d, i){
+      var p = d.date.split("-").map(Number), noon = etToUtc(p[0], p[1], p[2], 12, 0), lab = dayFmt.format(new Date(noon));
+      return {i: i, date: d.date, dow: d.weekday, num: p[2], label: lab, short: lab.split(",")[0], slots: d.slots, ok: d.ok, reason: d.reason};
+    });
+    var first = null;
+    if (m.first){ for (var k = 0; k < days.length; k++){ if (days[k].date === m.first.date){ first = {day: k, slot: m.first.slot}; break; } } }
+    return {now: now, earliest: m.earliest, days: days, first: first};
+  }
+
+  /* ---- Render ---- */
+  var $ = function(id){ return document.getElementById(id); };
+
+  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function renderMenu(){
+    var ul = $("menu"); ul.innerHTML = "";
+    if (!ITEMS.length){ ul.innerHTML = '<li class="cat">The menu is not available right now. Please check back soon.</li>'; return; }
+    var last = null;
+    ITEMS.forEach(function(it){
+      if (it.category !== last){
+        var h = document.createElement("li"); h.className = "cat"; h.textContent = it.category; ul.appendChild(h); last = it.category;
+      }
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<span class="name">'+esc(it.name)+(it.note ? '<span class="note">'+esc(it.note)+'</span>' : '')+'</span>'+
+        '<span class="price">'+money(it.price)+'</span>'+
+        '<span class="stepper">'+
+          '<button type="button" data-id="'+esc(it.id)+'" data-d="-1" aria-label="Remove one '+esc(it.name)+'">−</button>'+
+          '<output id="q-'+esc(it.id)+'" aria-live="polite">0</output>'+
+          '<button type="button" data-id="'+esc(it.id)+'" data-d="1" aria-label="Add one '+esc(it.name)+'">+</button>'+
+        '</span>';
+      ul.appendChild(li);
+    });
+  }
+
+  function renderPickup(){
+    model = build(nowMs());
+    var ev = $("earliest"), why = $("why");
+    if (model.first){
+      var f = model.first.slot, fd = model.days[model.first.day];
+      ev.innerHTML = "Earliest pickup: <strong>"+fd.label+", "+range(f.start,f.end)+"</strong>";
+      why.textContent = LEAD_HOURS+" hours from now is "+dayFmt.format(new Date(model.earliest))+" at "+clock(model.earliest)+". The first open window at or after that time is "+clock(f.start)+".";
+    } else {
+      ev.textContent = "No pickup times are open in the next "+MAX_DAYS+" days.";
+      why.textContent = "";
+    }
+
+    // keep the selection only if it is still valid
+    var valid = false;
+    if (dayIdx !== null && slotStart !== null){
+      var dd = model.days[dayIdx];
+      valid = !!dd && dd.slots.some(function(s){return s.start===slotStart && s.ok;});
+    }
+    if (!valid){ slotStart = null; }
+    if (dayIdx === null || !model.days[dayIdx] || !model.days[dayIdx].ok){
+      dayIdx = model.first ? model.first.day : null;
+    }
+
+    var daysEl = $("days"); daysEl.innerHTML = "";
+    model.days.forEach(function(d){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.dataset.i = d.i;
+      b.disabled = !d.ok;
+      b.setAttribute("aria-pressed", String(d.i === dayIdx));
+      b.setAttribute("aria-label", d.label + (d.ok ? "" : ", unavailable: " + d.reason));
+      b.innerHTML = '<span class="dow">'+d.short+'</span><span class="num">'+d.num+'</span><span class="why-not">'+d.reason+'</span>';
+      daysEl.appendChild(b);
+    });
+
+    var slotsEl = $("slots"); slotsEl.innerHTML = "";
+    var sel = dayIdx !== null ? model.days[dayIdx] : null;
+    if (!sel){
+      slotsEl.innerHTML = '<p class="empty">Pick a day to see times.</p>';
+    } else {
+      sel.slots.forEach(function(s){
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "slot"; b.dataset.s = s.start;
+        b.disabled = !s.ok;
+        b.setAttribute("aria-pressed", String(s.start === slotStart));
+        b.textContent = range(s.start,s.end);
+        if (!s.ok) b.title = s.start < model.earliest ? "Too soon" : "Too far ahead";
+        slotsEl.appendChild(b);
+      });
+    }
+    renderSummary();
+  }
+
+  function renderSummary(){
+    var count = 0, total = 0;
+    ITEMS.forEach(function(it){ count += qty[it.id]; total += qty[it.id]*it.price; $("q-"+it.id).textContent = qty[it.id]; });
+    ITEMS.forEach(function(it){
+      var minus = document.querySelector('button[data-id="'+it.id+'"][data-d="-1"]');
+      if (minus) minus.disabled = qty[it.id] === 0;
+    });
+    var parts = [];
+    parts.push(count ? count + (count===1?" item":" items") + ", " + money(total) : "No items yet");
+    if (slotStart !== null){
+      var sd = model.days[dayIdx];
+      parts.push("pickup " + sd.label + ", " + range(slotStart, slotStart + SLOT_MIN*60000));
+    } else {
+      parts.push("no pickup time chosen");
+    }
+    $("sumLine").textContent = parts.join(". ") + ".";
+    $("reserve").disabled = !(count > 0 && slotStart !== null);
+    notify();
+  }
+
+  function renderHours(){
+    var dl = $("hours"); dl.innerHTML = "";
+    [1,2,3,4,5,6,0].forEach(function(dow){
+      var h = HOURS[dow];
+      var dt = document.createElement("dt"); dt.textContent = DAYNAMES[dow];
+      var dd = document.createElement("dd"); dd.textContent = h ? minLabel(h[0]) + " to " + minLabel(h[1]) : "Closed";
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+  }
+
+  function renderClockNote(){
+    $("clockNote").textContent = fakeNow === null
+      ? "Using the real time now."
+      : "Pretending it\u2019s " + dayFmt.format(new Date(fakeNow)) + " at " + clock(fakeNow) + " Eastern.";
+  }
+  function toInputValue(ms){
+    var p = etParts(ms), z = function(n){ return String(n).padStart(2,"0"); };
+    return p.year+"-"+z(p.month)+"-"+z(p.day)+"T"+z(p.hour)+":"+z(p.minute);
+  }
+  function setFake(ms){
+    fakeNow = ms; slotStart = null; dayIdx = null;
+    try { if (ms === null) localStorage.removeItem("hs-fake-now"); else localStorage.setItem("hs-fake-now", String(ms)); } catch (e) {}
+    $("fakeNow").value = ms === null ? "" : toInputValue(ms);
+    renderClockNote(); renderPickup();
+  }
+
+  /* ---- Events ---- */
+  $("menu").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-id]"); if (!b) return;
+    var id = b.dataset.id, d = +b.dataset.d;
+    qty[id] = Math.max(0, Math.min(20, qty[id] + d));
+    $("demoMsg").textContent = "";
+    renderSummary();
+  });
+  $("days").addEventListener("click", function(e){
+    var b = e.target.closest("button.chip"); if (!b || b.disabled) return;
+    dayIdx = +b.dataset.i; slotStart = null; $("demoMsg").textContent = "";
+    renderPickup();
+  });
+  $("slots").addEventListener("click", function(e){
+    var b = e.target.closest("button.slot"); if (!b || b.disabled) return;
+    slotStart = +b.dataset.s; $("demoMsg").textContent = "";
+    renderPickup();
+  });
+  $("fakeNow").addEventListener("change", function(){
+    var v = this.value; if (!v){ setFake(null); return; }
+    var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(v); if (!m) return;
+    setFake(etToUtc(+m[1],+m[2],+m[3],+m[4],+m[5]));
+  });
+  $("useReal").addEventListener("click", function(){ setFake(null); });
+  $("presets").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-dow]"); if (!b) return;
+    var p = etParts(Date.now()), want = +b.dataset.dow;
+    for (var i=0;i<8;i++){
+      var d = new Date(Date.UTC(p.year,p.month-1,p.day+i));
+      if (d.getUTCDay() === want){
+        setFake(etToUtc(d.getUTCFullYear(),d.getUTCMonth()+1,d.getUTCDate(),+b.dataset.h,+b.dataset.m));
+        return;
+      }
+    }
+  });
+  $("reserve").addEventListener("click", function(){ if (window.HS && HS.openCart) HS.openCart(); });
+  $("joinForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = $("email").value.trim(), msg = $("joinMsg");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){ msg.style.color = "var(--danger)"; msg.textContent = "Enter an email address like name@example.com."; return; }
+    msg.style.color = ""; msg.textContent = "Thanks! This is an example page, so the address wasn\u2019t saved.";
+    $("email").value = "";
+  });
+
+  /* ---- Contact form ---- */
+  var CONTACT_TO = 'sales@hearthandsoulbakery.com';
+  // To send for real, set this to your form service or serverless function.
+  // It should accept a JSON POST and forward it to CONTACT_TO.
+  var FORM_ENDPOINT = '';
+
+  /* ---- Captcha ---- */
+  // Built-in challenge: an image of characters, or a simple question for anyone who can’t read the image.
+  // It runs in the browser, so it only stops simple bots. For real protection, set a provider and its public
+  // site key below ('turnstile', 'hcaptcha' or 'recaptcha'). The widget then replaces the built-in challenge,
+  // and the token it returns is sent with the form. Your server or form service must verify that token
+  // with the provider’s secret key.
+  var CAPTCHA = {provider: '', siteKey: ''};
+  var challenge = {kind: 'chars', answer: ''};
+  var providerToken = '', providerWidget = null;
+  var CHARS = 'ABCDEFGHJKMNPQRTUVWXYZ2346789';
+  var WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  var PROVIDERS = {
+    turnstile: {src: 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit', api: 'turnstile'},
+    hcaptcha: {src: 'https://js.hcaptcha.com/1/api.js?render=explicit', api: 'hcaptcha'},
+    recaptcha: {src: 'https://www.google.com/recaptcha/api.js?render=explicit', api: 'grecaptcha'}
+  };
+  function rnd(n){ return Math.floor(Math.random() * n); }
+  function randomChars(n){ var s = ''; for (var i = 0; i < n; i++) s += CHARS.charAt(rnd(CHARS.length)); return s; }
+  function drawChars(text){
+    var c = $('cCanvas'), g = c.getContext('2d'), w = c.width, h = c.height, i;
+    if (!g) return;
+    g.fillStyle = '#FFFDF8'; g.fillRect(0, 0, w, h);
+    for (i = 0; i < 7; i++){
+      g.strokeStyle = 'rgba(96,56,32,' + (0.25 + Math.random() * 0.3) + ')'; g.lineWidth = 2 + Math.random() * 3;
+      g.beginPath(); g.moveTo(Math.random() * w, Math.random() * h);
+      g.bezierCurveTo(Math.random() * w, Math.random() * h, Math.random() * w, Math.random() * h, Math.random() * w, Math.random() * h);
+      g.stroke();
+    }
+    var step = (w - 60) / text.length;
+    for (i = 0; i < text.length; i++){
+      g.save();
+      g.translate(36 + i * step + step / 2, h / 2 + (Math.random() * 24 - 12));
+      g.rotate(Math.random() * 0.7 - 0.35);
+      g.font = 'bold ' + (60 + rnd(16)) + 'px Alegreya, Georgia, serif';
+      g.fillStyle = '#33200F'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(text.charAt(i), 0, 0);
+      g.restore();
+    }
+    for (i = 0; i < 45; i++){ g.fillStyle = 'rgba(96,56,32,0.35)'; g.fillRect(rnd(w), rnd(h), 4, 4); }
+  }
+  function newCaptcha(){
+    $('cCaptcha').value = ''; fieldError('cCaptcha', '');
+    var chars = challenge.kind === 'chars';
+    $('cCanvas').hidden = !chars; $('cNew').hidden = !chars; $('cQuestion').hidden = chars;
+    $('cSwitch').textContent = chars ? 'Use a question instead' : 'Use an image instead';
+    $('cCaptchaLabel').textContent = chars ? 'Type the characters you see' : 'Answer the question';
+    if (chars){
+      challenge.answer = randomChars(5); drawChars(challenge.answer);
+    } else {
+      var a = 2 + rnd(8), b = 2 + rnd(8);
+      challenge.answer = String(a + b);
+      $('cQuestion').textContent = 'What is ' + WORDS[a] + ' plus ' + WORDS[b] + '?';
+    }
+  }
+  function captchaProblem(){
+    if (providerWidget !== null) return providerToken ? '' : 'Complete the verification above.';
+    var v = $('cCaptcha').value.trim(), chars = challenge.kind === 'chars';
+    if (!v) return chars ? 'Type the characters from the image.' : 'Answer the question.';
+    if ((chars ? v.toUpperCase() : v) === challenge.answer) return '';
+    newCaptcha();
+    return 'That doesn’t match. Try the new ' + (chars ? 'image.' : 'question.');
+  }
+  function initProvider(){
+    var p = PROVIDERS[CAPTCHA.provider];
+    if (!p || !CAPTCHA.siteKey) return;
+    var s = document.createElement('script'); s.src = p.src; s.async = true; s.defer = true;
+    s.onload = function(){
+      var lib = window[p.api]; if (!lib) return;
+      var box = $('cProvider');
+      function draw(){
+        providerWidget = lib.render(box, {
+          sitekey: CAPTCHA.siteKey,
+          callback: function(t){ providerToken = t; fieldError('cCaptcha', ''); },
+          'expired-callback': function(){ providerToken = ''; }
+        });
+        $('cBuiltin').hidden = true; box.hidden = false;
+      }
+      if (CAPTCHA.provider === 'recaptcha' && typeof lib.ready === 'function') lib.ready(draw); else draw();
+    };
+    s.onerror = function(){ /* provider blocked or offline: the built-in challenge stays */ };
+    document.head.appendChild(s);
+  }
+  function resetProvider(){
+    providerToken = '';
+    var p = PROVIDERS[CAPTCHA.provider];
+    if (providerWidget !== null && p && window[p.api]){ try { window[p.api].reset(providerWidget); } catch (e) {} }
+  }
+  $('cNew').addEventListener('click', function(){ newCaptcha(); $('cCaptcha').focus(); });
+  $('cSwitch').addEventListener('click', function(){ challenge.kind = challenge.kind === 'chars' ? 'math' : 'chars'; newCaptcha(); $('cCaptcha').focus(); });
+  newCaptcha(); initProvider();
+
+  function mk(tag, text, cls){ var n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; }
+  function fieldError(id, msg){
+    $(id + 'Err').textContent = msg || '';
+    $(id).setAttribute('aria-invalid', msg ? 'true' : 'false');
+    return !msg;
+  }
+  function validateContact(){
+    var ok = true, firstBad = null;
+    function check(id, msg){ var good = fieldError(id, msg); if (!good && !firstBad) firstBad = $(id); ok = ok && good; }
+    check('cName', $('cName').value.trim() ? '' : 'Enter your name.');
+    check('cEmail', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('cEmail').value.trim()) ? '' : 'Enter an email address like name@example.com.');
+    check('cMsg', $('cMsg').value.trim().length >= 10 ? '' : 'Write a message of at least 10 characters.');
+    check('cCaptcha', captchaProblem());
+    check('cConsent', $('cConsent').checked ? '' : 'Check the box so we can use this to reply.');
+    if (firstBad) firstBad.focus();
+    return ok;
+  }
+  function contactBody(d){
+    return 'Name: ' + d.name + '\nEmail: ' + d.email + (d.phone ? '\nPhone: ' + d.phone : '') + '\nTopic: ' + d.topic + '\n\n' + d.message;
+  }
+  function showResult(nodes){
+    var box = $('cResult'); box.innerHTML = '';
+    nodes.forEach(function(n){ box.appendChild(n); });
+    box.setAttribute('tabindex', '-1'); box.focus();
+  }
+  function showSent(d){
+    showResult([mk('h3', 'Message sent'), mk('p', 'Thanks' + (d && d.name ? ', ' + d.name : '') + '. We’ll reply to ' + (d && d.email ? d.email : 'you') + ' as soon as we can.')]);
+    $('contactForm').reset(); newCaptcha(); resetProvider();
+  }
+  function showFallback(d, failed){
+    var body = contactBody(d); newCaptcha(); resetProvider();
+    var h = mk('h3', 'Your message is ready to send');
+    var p = mk('p', (failed ? 'We couldn’t send that from this page. ' : 'This example page can’t send email by itself. ') + 'Send it from your own email app to ' + CONTACT_TO + '.');
+    var ta = mk('textarea'); ta.readOnly = true; ta.value = body; ta.setAttribute('aria-label', 'Your message');
+    var actions = mk('div', '', 'actions');
+    var a = mk('a', 'Open in your email app', 'btn btn-primary');
+    a.href = 'mailto:' + CONTACT_TO + '?subject=' + encodeURIComponent('Website message: ' + d.topic) + '&body=' + encodeURIComponent(body);
+    var copy = mk('button', 'Copy message', 'btn btn-ghost'); copy.type = 'button';
+    var note = mk('p', '', 'fine-dark');
+    copy.addEventListener('click', function(){
+      function done(ok){ note.textContent = ok ? 'Copied.' : 'Copying isn’t available here. Select the text above and copy it.'; }
+      try { navigator.clipboard.writeText(body).then(function(){ done(true); }, function(){ ta.select(); done(false); }); }
+      catch (err) { ta.select(); done(false); }
+    });
+    actions.appendChild(a); actions.appendChild(copy);
+    showResult([h, p, ta, actions, note]);
+  }
+  $('contactForm').addEventListener('input', function(e){
+    var id = e.target.id;
+    if (id && $(id + 'Err') && $(id + 'Err').textContent) fieldError(id, '');
+  });
+  $('contactForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if ($('cWebsite').value){ showSent(null); return; }  // spam trap: bots fill hidden fields
+    if (!validateContact()) return;
+    var data = {name: $('cName').value.trim(), email: $('cEmail').value.trim(), phone: $('cPhone').value.trim(), topic: $('cTopic').value, message: $('cMsg').value.trim()};
+    if (providerToken) data.captcha = {provider: CAPTCHA.provider, token: providerToken};
+    if (!FORM_ENDPOINT){ showFallback(data, false); return; }
+    var btn = $('cSend'); btn.disabled = true; btn.textContent = 'Sending…';
+    fetch(FORM_ENDPOINT, {method: 'POST', headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}, body: JSON.stringify(data)})
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); showSent(data); })
+      .catch(function(){ showFallback(data, true); })
+      .then(function(){ btn.disabled = false; btn.textContent = 'Send message'; });
+  });
+
+  /* ---- Business hours editor ---- */
+  function toTime(m){ return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); }
+  function fromTime(v){ var m = /^(\d{2}):(\d{2})$/.exec(v); return m ? (+m[1])*60 + (+m[2]) : null; }
+  function updateLabels(){
+    $("maxDaysText").textContent = MAX_DAYS;
+    $("leadText").textContent = LEAD_HOURS;
+  }
+
+  /* ---- Bridge for js/hs-test.js (cart, checkout, refresh) ---- */
+  var listeners = [];
+  function notify(){ listeners.forEach(function(f){ try { f(); } catch (e) {} }); }
+  var catalogMeta = {generatedAt: null, source: "snapshot"};
+  function selection(){
+    var d = (slotStart !== null && model && dayIdx !== null) ? model.days[dayIdx] : null;
+    return {slotStart: slotStart, text: d ? d.label + ", " + range(slotStart, slotStart + SLOT_MIN*60000) : ""};
+  }
+  function stillBookable(){
+    if (slotStart === null) return false;
+    return build(nowMs()).days.some(function(d){ return d.slots.some(function(s){ return s.ok && s.start === slotStart; }); });
+  }
+  function apiBase(){ return String(SETTINGS.apiBase || "").trim().replace(/\/+$/, ""); }
+  function catalogUrl(){ return apiBase() ? apiBase() + "/menu" : "data/menu.json?ts=" + Date.now(); }
+  function reloadCatalog(){
+    return fetch(catalogUrl(), {cache: "no-store"}).then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }).then(function(c){
+      var old = {}, next = {}, diff = {added: [], removed: [], changed: []};
+      ITEMS.forEach(function(i){ old[i.id] = i; });
+      (c.items || []).forEach(function(i){
+        next[i.id] = i;
+        var o = old[i.id];
+        if (!o) diff.added.push(i.name);
+        else if (o.price !== i.price) diff.changed.push(i.name + " " + money(o.price) + " → " + money(i.price));
+        else if (o.name !== i.name) diff.changed.push(o.name + " → " + i.name);
+      });
+      ITEMS.forEach(function(i){ if (!next[i.id]) diff.removed.push(i.name); });
+      var oldQty = qty; qty = {};
+      ITEMS = c.items || [];
+      ITEMS.forEach(function(i){ qty[i.id] = oldQty[i.id] || 0; });
+      catalogMeta = {generatedAt: c.generatedAt || null, source: apiBase() ? "live" : "snapshot"};
+      renderMenu(); renderSummary();
+      return diff;
+    });
+  }
+  window.HS = {
+    items: function(){ return ITEMS; },
+    qty: function(id){ return qty[id] || 0; },
+    setQty: function(id, n){ if (id in qty){ qty[id] = Math.max(0, Math.min(20, n)); renderSummary(); } },
+    clearCart: function(){ Object.keys(qty).forEach(function(k){ qty[k] = 0; }); slotStart = null; renderPickup(); },
+    selection: selection, stillBookable: stillBookable, nowMs: nowMs,
+    settings: function(){ return SETTINGS; }, meta: function(){ return catalogMeta; },
+    onChange: function(f){ listeners.push(f); }, reloadCatalog: reloadCatalog,
+    money: money, esc: esc
+  };
+
+  /* ---- Go ---- */
+  function getJson(url){ return fetch(url, {cache: "no-cache"}).then(function(r){ if (!r.ok) throw new Error(url); return r.json(); }); }
+  function readOverride(){ try { var o = JSON.parse(localStorage.getItem("hs-admin-settings")); return o && typeof o === "object" ? o : null; } catch (e) { return null; } }
+  function start(){
+    ITEMS.forEach(function(i){ qty[i.id] = 0; });
+    applySettings(clone(DEFAULTS));
+    updateLabels();
+    renderMenu(); renderHours(); renderClockNote(); renderPickup();
+    try { var sf = localStorage.getItem("hs-fake-now"); if (sf && isFinite(+sf)) setFake(+sf); } catch (e) {}
+    setInterval(function(){ if (fakeNow === null) renderPickup(); }, 60000);
+  }
+  getJson("data/settings.json").catch(function(){ return {}; }).then(function(s){
+    var ov = readOverride();
+    SETTINGS = Object.assign({}, s, ov || {});
+    if (SETTINGS.hours) DEFAULTS = {lead: SETTINGS.leadHours, maxDays: SETTINGS.maxDays, slot: SETTINGS.slotMinutes, hours: SETTINGS.hours};
+    BLACKOUT = SETTINGS.blackoutDates || [];
+    if (ov && Object.keys(ov).some(function(k){ return k !== "apiBase"; })){ var n = $("overrideNote"); n.hidden = false; n.textContent = "Using settings saved from Test admin in this browser."; }
+    // Prefer the live service when one is configured; fall back to the saved snapshot, and say which one loaded.
+    var wantLive = !!apiBase();
+    return getJson(wantLive ? apiBase() + "/menu" : "data/menu.json").then(function(c){ return {c: c, live: wantLive}; })
+      .catch(function(){ return getJson("data/menu.json").then(function(c){ return {c: c, live: false}; }); });
+  }).then(function(r){
+    ITEMS = r.c.items || [];
+    catalogMeta = {generatedAt: r.c.generatedAt || null, source: r.live ? "live" : "snapshot"};
+  }).catch(function(){ /* menu shows its empty message */ }).then(start);
+
+})();
+</script>
+<script type="module" src="js/hs-test.js"></script>
+</body>
+</html>
