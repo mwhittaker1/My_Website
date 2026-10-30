@@ -3,8 +3,28 @@
   "leadHours": 24,
   "maxDays": 14,
   "slotMinutes": 60,
-  "hours": { "0": [600, 840], "1": null, "2": null, "3": null, "4": [540, 1020], "5": [540, 1020], "6": [540, 1020] },
+  "hours": {
+    "0": [
+      600,
+      840
+    ],
+    "1": null,
+    "2": null,
+    "3": null,
+    "4": [
+      540,
+      1020
+    ],
+    "5": [
+      540,
+      1020
+    ],
+    "6": [
+      540,
+      1020
+    ]
+  },
   "blackoutDates": [],
-  "apiBase": "",
+  "apiBase": "https://broker-polyester-louise-optimize.trycloudflare.com/api",
   "testTaxRate": 0.08
 }
