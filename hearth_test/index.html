@@ -237,6 +237,7 @@ address{font-style:normal;margin-bottom:1.25rem}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 <link rel="stylesheet" href="css/test-mode.css">
+<link rel="stylesheet" href="css/store.css">
 <script src="js/connect.js"></script>
 </head>
 <body>
@@ -247,6 +248,7 @@ address{font-style:normal;margin-bottom:1.25rem}
     <a href="release-notes.html">What’s real and what’s not</a>
     <a href="test_admin/">Test admin</a>
     <a href="test_submissions/">Test submissions</a>
+    <a href="test_comments/">Test comments</a>
   </div>
   <div class="tb-row tb-clock">
     <label for="fakeNow">Set a date and time to test from <span class="tb-sub">(Eastern)</span></label>
@@ -308,26 +310,36 @@ address{font-style:normal;margin-bottom:1.25rem}
         <img src="assets/img-3.webp" alt="" width="190" height="168">
       </div>
 
-      <div class="order-grid">
-        <div class="order-menu">
-          <h3>Choose your items</h3>
-          <div class="menu-tools">
-            <button type="button" class="mini" id="refreshCatalog">Refresh catalogue</button>
-            <span class="fine" id="catalogStatus" role="status"></span>
+      <div class="order-stack">
+        <div class="store">
+          <div class="store-head">
+            <h3>Choose your items</h3>
+            <div class="menu-tools">
+              <button type="button" class="mini" id="refreshCatalog">Refresh catalogue</button>
+              <span class="fine" id="catalogStatus" role="status"></span>
+            </div>
           </div>
-
-          <ul class="menu" id="menu"></ul>
+          <nav class="cat-tabs" id="catTabs" aria-label="Menu categories"></nav>
+          <div class="products" id="menu"></div>
         </div>
 
-        <div class="order-when">
+        <div class="pickup">
           <h3>Choose a pickup time</h3>
-          <p class="earliest" id="earliest" aria-live="polite"></p>
-          <p class="why" id="why"></p>
-          <div class="days" id="days" role="group" aria-label="Pickup day"></div>
-          <div class="slots" id="slots" role="group" aria-label="Pickup time"></div>
-          <p class="fine" style="margin-top:.9rem">All times are Eastern.</p>
-
+          <div class="pick-top">
+            <p class="earliest" id="earliest" aria-live="polite"></p>
+            <button type="button" class="mini" id="pickEarliest">Pick the earliest time</button>
           </div>
+          <p class="why" id="why"></p>
+          <div class="pick-grid">
+            <div class="cal" id="cal" role="group" aria-label="Pickup date"></div>
+            <div class="pick-times">
+              <p class="pick-day" id="pickDay"></p>
+              <div class="slots" id="slots" role="group" aria-label="Pickup time"></div>
+              <p class="fine" style="margin-top:.9rem">All times are Eastern.</p>
+            </div>
+          </div>
+          <p class="cal-msg" id="calMsg" role="status"></p>
+        </div>
 
         <div class="summary">
           <p class="sum-line" id="sumLine" aria-live="polite"></p>
@@ -543,25 +555,147 @@ import {buildSlots} from "./js/pickup.js";
   var $ = function(id){ return document.getElementById(id); };
 
   function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
-  function renderMenu(){
-    var ul = $("menu"); ul.innerHTML = "";
-    if (!ITEMS.length){ ul.innerHTML = '<li class="cat">The menu is not available right now. Please check back soon.</li>'; return; }
-    var last = null;
+  /* ---- Store menu: category tabs + product cards (one card per product, choices as pills) ---- */
+  var calMonth = null, calMonths = [], activeCat = "All", pickVariant = {}, cardEls = {}, renderListeners = [];
+  var GLYPHS = [[/pie/i,"🥧"],[/cookie/i,"🍪"],[/brownie|chocolate bar/i,"🍫"],[/scone|croissant|roll|muffin|sfogliatelle|pudding|cake/i,"🥐"],[/challah|focaccia|bread|loaf/i,"🍞"],[/juice/i,"🧃"],[/milk/i,"🥛"],[/ice cream/i,"🍨"],[/yogurt/i,"🥣"],[/honey/i,"🍯"],[/egg|sandwich/i,"🥪"],[/tray|catering|dozen/i,"🍽️"]];
+  var CAT_GLYPH = {"Bread":"🍞","Pastries":"🥐","Cookies":"🍪","Breakfast Sandwich":"🥪","Beverages":"🥛","Ice Cream":"🍨","Catering":"🍽️","Holiday":"🎁","Miscellaneous":"🍯"};
+  function glyphFor(g){ for (var i = 0; i < GLYPHS.length; i++){ if (GLYPHS[i][0].test(g.name)) return GLYPHS[i][1]; } return CAT_GLYPH[g.category] || "🍞"; }
+
+  // The page works with one flat list of purchasable SKUs (ITEMS). A product is the set of SKUs that share a groupId.
+  function groups(){
+    var map = {}, list = [];
     ITEMS.forEach(function(it){
-      if (it.category !== last){
-        var h = document.createElement("li"); h.className = "cat"; h.textContent = it.category; ul.appendChild(h); last = it.category;
-      }
-      var li = document.createElement("li");
-      li.innerHTML =
-        '<span class="name">'+esc(it.name)+(it.note ? '<span class="note">'+esc(it.note)+'</span>' : '')+'</span>'+
-        '<span class="price">'+money(it.price)+'</span>'+
-        '<span class="stepper">'+
-          '<button type="button" data-id="'+esc(it.id)+'" data-d="-1" aria-label="Remove one '+esc(it.name)+'">−</button>'+
-          '<output id="q-'+esc(it.id)+'" aria-live="polite">0</output>'+
-          '<button type="button" data-id="'+esc(it.id)+'" data-d="1" aria-label="Add one '+esc(it.name)+'">+</button>'+
-        '</span>';
-      ul.appendChild(li);
+      var gid = it.groupId || it.id;
+      if (!map[gid]){ map[gid] = {id: gid, name: it.groupName || it.name, category: it.category, note: it.note || "", items: []}; list.push(map[gid]); }
+      map[gid].items.push(it);
     });
+    return list;
+  }
+  function selectedOf(g){
+    for (var i = 0; i < g.items.length; i++){ if (g.items[i].id === pickVariant[g.id]) return g.items[i]; }
+    pickVariant[g.id] = g.items[0].id;
+    return g.items[0];
+  }
+
+  function renderMenu(){
+    var root = $("menu"), tabs = $("catTabs");
+    root.innerHTML = ""; tabs.innerHTML = ""; cardEls = {};
+    var gs = groups();
+    if (!gs.length){ root.innerHTML = '<p class="store-empty">The menu is not available right now. Please check back soon.</p>'; return; }
+    var cats = [];
+    gs.forEach(function(g){ if (cats.indexOf(g.category) < 0) cats.push(g.category); });
+    if (activeCat !== "All" && cats.indexOf(activeCat) < 0) activeCat = "All";
+    ["All"].concat(cats).forEach(function(c){
+      var n = c === "All" ? gs.length : gs.filter(function(g){ return g.category === c; }).length;
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "cat-tab"; b.dataset.cat = c;
+      b.setAttribute("aria-pressed", String(c === activeCat));
+      b.textContent = c + " (" + n + ")";
+      tabs.appendChild(b);
+    });
+    gs.forEach(function(g){
+      var sel = selectedOf(g);
+      var card = document.createElement("article");
+      card.className = "pcard"; card.dataset.group = g.id; card.dataset.cat = g.category;
+      card.hidden = !(activeCat === "All" || activeCat === g.category);
+      var vopts = g.items.length > 1
+        ? '<div class="vopts" role="group" aria-label="Choose an option for ' + esc(g.name) + '">' + g.items.map(function(it){
+            return '<button type="button" class="vopt" data-id="' + esc(it.id) + '" data-label="' + esc(it.variant || it.name) + '" aria-pressed="' + (it.id === sel.id) + '">' + esc(it.variant || it.name) + '</button>';
+          }).join("") + '</div>'
+        : "";
+      card.innerHTML =
+        '<div class="c-img" aria-hidden="true">' + (sel.image ? '<img src="' + esc(sel.image) + '" alt="">' : glyphFor(g)) + '<span class="c-badge" hidden></span></div>' +
+        '<div class="c-body"><h4 class="c-name">' + esc(g.name) + '</h4>' +
+        (g.note ? '<p class="c-note">' + esc(g.note) + '</p>' : '') +
+        vopts +
+        '<div class="c-foot-slot" data-foot="' + esc(g.id) + '"></div>' +
+        '<div class="c-buy"><span class="c-price"></span>' +
+        '<button type="button" class="c-add">Add</button>' +
+        '<span class="c-stepper" hidden><button type="button" class="c-dec">−</button><output aria-live="polite">0</output><button type="button" class="c-inc">+</button></span></div></div>';
+      root.appendChild(card);
+      cardEls[g.id] = card;
+    });
+    updateCards();
+    renderListeners.forEach(function(f){ try { f(gs); } catch (e) {} });
+  }
+
+  // Refresh the numbers on the cards (price, quantity, "in cart" badge) without rebuilding them.
+  function updateCards(){
+    groups().forEach(function(g){
+      var card = cardEls[g.id]; if (!card) return;
+      var sel = selectedOf(g), q = qty[sel.id] || 0, total = 0;
+      g.items.forEach(function(it){ total += qty[it.id] || 0; });
+      card.querySelector(".c-price").textContent = money(sel.price);
+      var add = card.querySelector(".c-add"), st = card.querySelector(".c-stepper");
+      add.hidden = q > 0; st.hidden = q === 0;
+      add.setAttribute("aria-label", "Add " + sel.name + " to cart");
+      st.querySelector("output").textContent = q;
+      st.querySelector(".c-dec").setAttribute("aria-label", "Remove one " + sel.name);
+      st.querySelector(".c-inc").setAttribute("aria-label", "Add one " + sel.name);
+      var badge = card.querySelector(".c-badge");
+      badge.hidden = total === 0; badge.textContent = total + " in cart";
+      card.querySelectorAll(".vopt").forEach(function(b){
+        var n = qty[b.dataset.id] || 0;
+        b.setAttribute("aria-pressed", String(b.dataset.id === sel.id));
+        b.textContent = b.dataset.label + (n ? " ×" + n : "");
+      });
+    });
+  }
+
+  /* ---- Pickup: month calendar (phone-friendly) + time windows ---- */
+  function monthLabel(ym){
+    var y = +ym.slice(0, 4), m = +ym.slice(5, 7);
+    return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("en-US", {timeZone: "UTC", month: "long", year: "numeric"});
+  }
+  function dayWhy(d, date){
+    if (!d) return date < model.days[0].date ? "That day has passed." : "We take orders up to " + MAX_DAYS + " days ahead.";
+    if (d.reason === "Closed") return d.label + ": we’re closed.";
+    if (d.reason === "Unavailable") return d.label + ": not available for pickup.";
+    if (d.reason === "Too soon") return d.label + ": too soon. We need " + LEAD_HOURS + " hours’ notice.";
+    if (d.reason === "Too far") return d.label + ": too far ahead.";
+    return "";
+  }
+  function focusKey(){
+    var a = document.activeElement;
+    if (!a || !a.closest) return null;
+    if (a.closest("#cal")) return a.dataset.date ? "#cal [data-date=\"" + a.dataset.date + "\"]" : (a.dataset.dir ? "#cal [data-dir=\"" + a.dataset.dir + "\"]" : null);
+    if (a.closest("#slots") && a.dataset.s) return "#slots [data-s=\"" + a.dataset.s + "\"]";
+    return null;
+  }
+  function restoreFocus(sel){ if (!sel) return; var el = document.querySelector(sel); if (el) el.focus(); }
+
+  function renderCalendar(){
+    var byDate = {};
+    model.days.forEach(function(d){ byDate[d.date] = d; });
+    calMonths = [];
+    model.days.forEach(function(d){ var ym = d.date.slice(0, 7); if (calMonths.indexOf(ym) < 0) calMonths.push(ym); });
+    if (!calMonth || calMonths.indexOf(calMonth) < 0){
+      var anchor = dayIdx !== null ? model.days[dayIdx] : (model.first ? model.days[model.first.day] : model.days[0]);
+      calMonth = anchor.date.slice(0, 7);
+    }
+    var mi = calMonths.indexOf(calMonth), y = +calMonth.slice(0, 4), mo = +calMonth.slice(5, 7);
+    var startDow = new Date(Date.UTC(y, mo - 1, 1)).getUTCDay(), dim = new Date(Date.UTC(y, mo, 0)).getUTCDate();
+    var today = model.days[0].date;
+    var html = '<div class="cal-head"><button type="button" class="cal-nav" data-dir="-1" aria-label="Previous month"' + (mi <= 0 ? " disabled" : "") + '>‹</button>' +
+      '<strong aria-live="polite">' + monthLabel(calMonth) + '</strong>' +
+      '<button type="button" class="cal-nav" data-dir="1" aria-label="Next month"' + (mi >= calMonths.length - 1 ? " disabled" : "") + '>›</button></div>' +
+      '<div class="cal-grid" role="grid">';
+    ["S", "M", "T", "W", "T", "F", "S"].forEach(function(l, i){ html += '<div class="cal-dow" aria-hidden="true" title="' + DAYNAMES[i] + '">' + l + '</div>'; });
+    for (var b = 0; b < startDow; b++) html += '<span class="cal-day blank" aria-hidden="true"></span>';
+    for (var n = 1; n <= dim; n++){
+      var date = calMonth + "-" + String(n).padStart(2, "0"), d = byDate[date];
+      var cls = "cal-day " + (d && d.ok ? "ok" : "off") + (date === today ? " today" : "");
+      var label = d ? d.label + (d.ok ? "" : ", unavailable: " + d.reason) : date;
+      if (d && d.ok){
+        html += '<button type="button" class="' + cls + '" data-i="' + d.i + '" data-date="' + date + '" aria-pressed="' + (d.i === dayIdx) + '" aria-label="' + esc(label) + '">' + n + '</button>';
+      } else {
+        html += '<button type="button" class="' + cls + '" data-date="' + date + '" aria-disabled="true" data-why="' + esc(dayWhy(d, date)) + '" aria-label="' + esc(label) + '">' + n + '</button>';
+      }
+    }
+    html += '</div><div class="cal-legend"><span><i></i>Open</span><span><i class="sel"></i>Selected</span><span>Faded days are closed or unavailable. Tap one to see why.</span></div>';
+    var keep = focusKey();
+    $("cal").innerHTML = html;
+    restoreFocus(keep);
   }
 
   function renderPickup(){
@@ -569,37 +703,31 @@ import {buildSlots} from "./js/pickup.js";
     var ev = $("earliest"), why = $("why");
     if (model.first){
       var f = model.first.slot, fd = model.days[model.first.day];
-      ev.innerHTML = "Earliest pickup: <strong>"+fd.label+", "+range(f.start,f.end)+"</strong>";
-      why.textContent = LEAD_HOURS+" hours from now is "+dayFmt.format(new Date(model.earliest))+" at "+clock(model.earliest)+". The first open window at or after that time is "+clock(f.start)+".";
+      ev.innerHTML = "Earliest pickup: <strong>" + fd.label + ", " + range(f.start, f.end) + "</strong>";
+      why.textContent = LEAD_HOURS + " hours from now is " + dayFmt.format(new Date(model.earliest)) + " at " + clock(model.earliest) + ". The first open window at or after that time is " + clock(f.start) + ".";
     } else {
-      ev.textContent = "No pickup times are open in the next "+MAX_DAYS+" days.";
+      ev.textContent = "No pickup times are open in the next " + MAX_DAYS + " days.";
       why.textContent = "";
     }
+    $("pickEarliest").hidden = !model.first;
 
     // keep the selection only if it is still valid
     var valid = false;
     if (dayIdx !== null && slotStart !== null){
       var dd = model.days[dayIdx];
-      valid = !!dd && dd.slots.some(function(s){return s.start===slotStart && s.ok;});
+      valid = !!dd && dd.slots.some(function(s){ return s.start === slotStart && s.ok; });
     }
     if (!valid){ slotStart = null; }
     if (dayIdx === null || !model.days[dayIdx] || !model.days[dayIdx].ok){
       dayIdx = model.first ? model.first.day : null;
     }
 
-    var daysEl = $("days"); daysEl.innerHTML = "";
-    model.days.forEach(function(d){
-      var b = document.createElement("button");
-      b.type = "button"; b.className = "chip"; b.dataset.i = d.i;
-      b.disabled = !d.ok;
-      b.setAttribute("aria-pressed", String(d.i === dayIdx));
-      b.setAttribute("aria-label", d.label + (d.ok ? "" : ", unavailable: " + d.reason));
-      b.innerHTML = '<span class="dow">'+d.short+'</span><span class="num">'+d.num+'</span><span class="why-not">'+d.reason+'</span>';
-      daysEl.appendChild(b);
-    });
+    renderCalendar();
 
+    var keep = focusKey();
     var slotsEl = $("slots"); slotsEl.innerHTML = "";
     var sel = dayIdx !== null ? model.days[dayIdx] : null;
+    $("pickDay").textContent = sel ? sel.label + ": choose a time" : "Choose a day";
     if (!sel){
       slotsEl.innerHTML = '<p class="empty">Pick a day to see times.</p>';
     } else {
@@ -608,28 +736,26 @@ import {buildSlots} from "./js/pickup.js";
         b.type = "button"; b.className = "slot"; b.dataset.s = s.start;
         b.disabled = !s.ok;
         b.setAttribute("aria-pressed", String(s.start === slotStart));
-        b.textContent = range(s.start,s.end);
+        b.textContent = range(s.start, s.end);
         if (!s.ok) b.title = s.start < model.earliest ? "Too soon" : "Too far ahead";
         slotsEl.appendChild(b);
       });
     }
+    restoreFocus(keep);
     renderSummary();
   }
 
   function renderSummary(){
     var count = 0, total = 0;
-    ITEMS.forEach(function(it){ count += qty[it.id]; total += qty[it.id]*it.price; $("q-"+it.id).textContent = qty[it.id]; });
-    ITEMS.forEach(function(it){
-      var minus = document.querySelector('button[data-id="'+it.id+'"][data-d="-1"]');
-      if (minus) minus.disabled = qty[it.id] === 0;
-    });
+    ITEMS.forEach(function(it){ var q = qty[it.id] || 0; count += q; total += q * it.price; });
+    updateCards();
     var parts = [];
-    parts.push(count ? count + (count===1?" item":" items") + ", " + money(total) : "No items yet");
+    parts.push(count ? count + (count === 1 ? " item" : " items") + ", " + money(total) : "Cart is empty");
     if (slotStart !== null){
       var sd = model.days[dayIdx];
-      parts.push("pickup " + sd.label + ", " + range(slotStart, slotStart + SLOT_MIN*60000));
+      parts.push("Pickup " + sd.label + ", " + range(slotStart, slotStart + SLOT_MIN * 60000));
     } else {
-      parts.push("no pickup time chosen");
+      parts.push("No pickup time chosen");
     }
     $("sumLine").textContent = parts.join(". ") + ".";
     $("reserve").disabled = !(count > 0 && slotStart !== null);
@@ -664,15 +790,45 @@ import {buildSlots} from "./js/pickup.js";
 
   /* ---- Events ---- */
   $("menu").addEventListener("click", function(e){
-    var b = e.target.closest("button[data-id]"); if (!b) return;
-    var id = b.dataset.id, d = +b.dataset.d;
-    qty[id] = Math.max(0, Math.min(20, qty[id] + d));
+    var card = e.target.closest(".pcard"), t = e.target.closest("button");
+    if (!card || !t) return;
+    var g = groups().filter(function(x){ return x.id === card.dataset.group; })[0];
+    if (!g) return;
+    var sel = selectedOf(g);
+    if (t.classList.contains("vopt")){ pickVariant[g.id] = t.dataset.id; updateCards(); return; }
+    var d = (t.classList.contains("c-add") || t.classList.contains("c-inc")) ? 1 : t.classList.contains("c-dec") ? -1 : 0;
+    if (!d) return;
+    qty[sel.id] = Math.max(0, Math.min(20, (qty[sel.id] || 0) + d));
     $("demoMsg").textContent = "";
     renderSummary();
   });
-  $("days").addEventListener("click", function(e){
-    var b = e.target.closest("button.chip"); if (!b || b.disabled) return;
-    dayIdx = +b.dataset.i; slotStart = null; $("demoMsg").textContent = "";
+  $("catTabs").addEventListener("click", function(e){
+    var b = e.target.closest("button.cat-tab"); if (!b) return;
+    activeCat = b.dataset.cat;
+    renderMenu();
+  });
+  $("cal").addEventListener("click", function(e){
+    var nav = e.target.closest("button.cal-nav");
+    if (nav){
+      if (nav.disabled) return;
+      var i = calMonths.indexOf(calMonth) + (+nav.dataset.dir);
+      if (i >= 0 && i < calMonths.length){ calMonth = calMonths[i]; renderCalendar(); }
+      return;
+    }
+    var b = e.target.closest("button.cal-day"); if (!b || b.classList.contains("blank")) return;
+    if (b.getAttribute("aria-disabled") === "true"){ $("calMsg").textContent = b.dataset.why || ""; return; }
+    dayIdx = +b.dataset.i; slotStart = null;
+    $("calMsg").textContent = ""; $("demoMsg").textContent = "";
+    renderPickup();
+    var again = document.querySelector('#cal [data-date="' + b.dataset.date + '"]'); if (again) again.focus();
+    // On a phone the times appear below the calendar, so bring them into view.
+    if (window.matchMedia && matchMedia("(max-width:760px)").matches) $("pickDay").scrollIntoView({block: "start", behavior: "smooth"});
+  });
+  $("pickEarliest").addEventListener("click", function(){
+    if (!model || !model.first) return;
+    dayIdx = model.first.day; slotStart = model.first.slot.start;
+    calMonth = model.days[dayIdx].date.slice(0, 7);
+    $("calMsg").textContent = ""; $("demoMsg").textContent = "";
     renderPickup();
   });
   $("slots").addEventListener("click", function(e){
@@ -918,6 +1074,7 @@ import {buildSlots} from "./js/pickup.js";
     selection: selection, stillBookable: stillBookable, nowMs: nowMs,
     settings: function(){ return SETTINGS; }, meta: function(){ return catalogMeta; },
     onChange: function(f){ listeners.push(f); }, reloadCatalog: reloadCatalog,
+    groups: groups, onRender: function(f){ renderListeners.push(f); if (cardEls && Object.keys(cardEls).length) f(groups()); },
     money: money, esc: esc
   };
 
@@ -950,5 +1107,6 @@ import {buildSlots} from "./js/pickup.js";
 })();
 </script>
 <script type="module" src="js/hs-test.js"></script>
+<script type="module" src="js/comments.js"></script>
 </body>
 </html>

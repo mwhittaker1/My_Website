@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<script src="../js/connect.js"></script>
+<title>Test comments | Hearth and Soul (TEST SITE)</title>
+<style>
+:root{--ink:#2a1a0c;--muted:#6b5440;--line:#e1d3bb;--bg:#faf6ee;--brand:#603820;--danger:#b00020;--warn:#fff3c4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.flag{background:var(--danger);color:#fff;text-align:center;padding:.5rem 1rem;font-weight:700}
+main{max-width:50rem;margin:0 auto;padding:1.25rem 1rem 4rem}
+h1{font-size:1.6rem;margin:.5rem 0}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem;margin:1rem 0}
+.note{background:var(--warn);border:1px solid #c9a227;border-radius:10px;padding:.7rem .9rem;font-size:.95rem}
+.muted{color:var(--muted);font-size:.93rem}
+.tools{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.8rem 0}
+input[type=password]{font:inherit;padding:.45rem .6rem;border:1.5px solid #9a8a72;border-radius:8px;background:#fff;color:var(--ink);min-width:14rem}
+button{font:inherit;padding:.45rem .95rem;border-radius:999px;border:1.5px solid var(--brand);background:#fff;color:var(--brand);cursor:pointer;min-height:40px}
+button.primary{background:var(--brand);color:#fff}
+button.danger{border-color:var(--danger);color:var(--danger)}
+button[aria-pressed="true"]{background:var(--brand);color:#fff}
+button:disabled{opacity:.5;cursor:wait}
+.err{color:var(--danger);min-height:1.3em}
+.cm{border:1px solid var(--line);border-radius:12px;background:#fff;padding:1rem 1.1rem;margin:.9rem 0}
+.cm header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.3rem 1rem;margin-bottom:.4rem}
+.cm .who{font-weight:700}
+.cm .meta{color:var(--muted);font-size:.9rem}
+.cm blockquote{margin:.5rem 0;padding:.6rem .8rem;background:#f6eedc;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.badge{font-size:.78rem;font-weight:700;border-radius:999px;padding:.05rem .55rem}
+.badge.pending{background:#fff3c4;color:#6b4e00}.badge.approved{background:#d9f2dd;color:#14532d}.badge.rejected{background:#fde2e1;color:#7f1d1d}
+fieldset{border:1px solid var(--line);border-radius:10px;margin:.6rem 0;padding:.5rem .8rem}
+legend{font-weight:650;padding:0 .3rem;font-size:.93rem}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:.1rem .8rem}
+.items label{display:flex;gap:.5rem;align-items:center;min-height:36px}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}
+.rowmsg{min-height:1.3em;font-size:.93rem;margin:.4rem 0 0}
+a{color:var(--brand)}
+code{background:#f3e9d6;padding:.05rem .3rem;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="flag">TEST SITE: review customer comments</div>
+<main>
+  <p><a href="../">← Back to the test page</a> · <a href="../test_submissions/">Test submissions</a> · <a href="../test_admin/">Test admin</a></p>
+  <h1>Test comments</h1>
+  <p class="note">Customers leave comments on the menu. Each one is emailed to the bakery (when email is connected) and stays <strong>hidden</strong> until you approve it here. When you approve, you choose which items it appears on. Visitors never see email addresses.</p>
+
+  <section class="card" id="sharedBox" hidden aria-labelledby="h-shared">
+    <h2 id="h-shared" style="font-size:1.1rem;margin:0 0 .4rem">Sign in</h2>
+    <form class="tools" id="tokenForm">
+      <label>Password <input type="password" id="token" autocomplete="off"></label>
+      <button type="submit" class="primary">Connect</button>
+      <button type="button" id="forget" hidden>Disconnect</button>
+    </form>
+    <p class="muted">Your password is sent to this server: <code id="serverAddr"></code></p>
+    <p class="muted" id="sharedMsg" role="status"></p>
+  </section>
+  <p class="muted" id="noApi" hidden>These pages aren’t connected to the test server, so there are no comments to review. Open the link you were given, or ask for the server to be restarted.</p>
+
+  <div class="tools" id="tabs" role="group" aria-label="Filter comments" hidden>
+    <button type="button" data-status="pending" aria-pressed="true">Needs review</button>
+    <button type="button" data-status="approved" aria-pressed="false">Showing on site</button>
+    <button type="button" data-status="rejected" aria-pressed="false">Rejected</button>
+    <button type="button" data-status="all" aria-pressed="false">All</button>
+    <button type="button" id="refresh">Refresh</button>
+    <span class="muted" id="count" role="status"></span>
+  </div>
+  <p class="muted" id="emailState"></p>
+  <p class="err" id="err" role="alert"></p>
+  <div id="list"></div>
+  <p class="muted" id="empty" hidden>No comments here yet.</p>
+</main>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const TOKEN_KEY = "hs-sub-token"; // shared with the submissions page, so one sign-in covers both
+const when = (iso) => new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" });
+
+let base = "";
+let token = "";
+let status = "pending";
+let products = []; // [{id, name}]
+
+// Everything a visitor wrote goes in with textContent, never innerHTML: it is untrusted input.
+function el(tag, text, cls) {
+  const n = document.createElement(tag);
+  if (text !== undefined) n.textContent = text;
+  if (cls) n.className = cls;
+  return n;
+}
+
+async function api(path, init = {}) {
+  const res = await fetch(base + path, { ...init, headers: { ...(init.headers ?? {}), Authorization: "Bearer " + token }, cache: "no-store" });
+  if (res.status === 401) throw Object.assign(new Error("Wrong password."), { code: 401 });
+  if (res.status === 429) throw new Error("Too many wrong passwords. Wait a few minutes and try again.");
+  if (res.status === 503) throw new Error("The server has no password configured yet.");
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || "HTTP " + res.status);
+  return body;
+}
+
+async function loadProducts() {
+  try {
+    const m = await (await fetch(base + "/menu", { cache: "no-store" })).json();
+    const seen = new Map();
+    for (const i of m.items ?? []) if (!seen.has(i.groupId || i.id)) seen.set(i.groupId || i.id, i.groupName || i.name);
+    products = [...seen].map(([id, name]) => ({ id, name }));
+  } catch { products = []; }
+}
+
+async function load() {
+  $("err").textContent = "";
+  try {
+    const data = await api("/comments/admin?status=" + status);
+    $("sharedMsg").textContent = "Connected.";
+    $("forget").hidden = false;
+    $("emailState").textContent = data.emailConfigured
+      ? "Email is on: new comments are emailed to the bakery."
+      : "Email is off: no mail service is connected, so new comments are NOT emailed. They still appear here for review.";
+    render(data.items);
+  } catch (e) {
+    $("list").replaceChildren();
+    $("empty").hidden = true;
+    if (e.code === 401) { token = ""; try { sessionStorage.removeItem(TOKEN_KEY); } catch {} $("forget").hidden = true; }
+    $("sharedMsg").textContent = token || e.code === 401 ? e.message : "Enter the password to see comments.";
+  }
+}
+
+function render(items) {
+  const list = $("list");
+  list.replaceChildren();
+  $("count").textContent = `${items.length} shown`;
+  $("empty").hidden = items.length > 0;
+  for (const c of items) list.appendChild(card(c));
+}
+
+function card(c) {
+  const box = el("article", undefined, "cm");
+  const head = el("header");
+  const left = el("div");
+  left.appendChild(el("span", c.name, "who"));
+  left.appendChild(el("span", c.email ? `  ${c.email}` : "  (no email given)", "meta"));
+  head.append(left, el("span", c.status, "badge " + c.status));
+  box.appendChild(head);
+  box.appendChild(el("div", `${when(c.ts)} Eastern · about: ${c.itemName || "general"}`, "meta"));
+  box.appendChild(el("blockquote", c.text));
+
+  const fs = el("fieldset");
+  fs.appendChild(el("legend", "Show on these items"));
+  const grid = el("div", undefined, "items");
+  const chosen = new Set(c.showOn?.length ? c.showOn : c.itemGroupId ? [c.itemGroupId] : []);
+  const list = products.length ? products : c.itemGroupId ? [{ id: c.itemGroupId, name: c.itemName || "This item" }] : [];
+  for (const p of list) {
+    const lab = el("label");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.value = p.id; cb.checked = chosen.has(p.id);
+    lab.append(cb, document.createTextNode(p.name));
+    grid.appendChild(lab);
+  }
+  fs.appendChild(grid);
+  box.appendChild(fs);
+
+  const msg = el("p", "", "rowmsg"); msg.setAttribute("role", "status");
+  const checked = () => [...grid.querySelectorAll("input:checked")].map((i) => i.value);
+  const actions = el("div", undefined, "actions");
+  const add = (label, cls, fn) => {
+    const b = el("button", label, cls); b.type = "button";
+    b.addEventListener("click", async () => {
+      msg.textContent = ""; b.disabled = true;
+      try { await fn(); await load(); } catch (e) { msg.textContent = e.message; b.disabled = false; }
+    });
+    actions.appendChild(b);
+  };
+  const send = (body) => api(`/comments/${encodeURIComponent(c.id)}/moderate`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (c.status === "approved") {
+    add("Save item changes", "primary", () => send({ action: "approve", showOn: checked() }));
+    add("Take down", "", () => send({ action: "unapprove" }));
+    add("Reject", "danger", () => send({ action: "reject" }));
+  } else {
+    add("Approve and show", "primary", () => send({ action: "approve", showOn: checked() }));
+    if (c.status === "pending") add("Reject", "danger", () => send({ action: "reject" }));
+  }
+  box.append(actions, msg);
+  return box;
+}
+
+$("tabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-status]");
+  if (!b) return;
+  status = b.dataset.status;
+  for (const t of $("tabs").querySelectorAll("button[data-status]")) t.setAttribute("aria-pressed", String(t === b));
+  load();
+});
+$("refresh").addEventListener("click", load);
+$("tokenForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  token = $("token").value; $("token").value = "";
+  try { sessionStorage.setItem(TOKEN_KEY, token); } catch {}
+  load();
+});
+$("forget").addEventListener("click", () => {
+  token = ""; try { sessionStorage.removeItem(TOKEN_KEY); } catch {}
+  $("forget").hidden = true; $("sharedMsg").textContent = "Disconnected."; $("list").replaceChildren(); $("count").textContent = "";
+});
+
+(async () => {
+  let s = {};
+  try { s = await (await fetch("../data/settings.json", { cache: "no-cache" })).json(); } catch {}
+  try { const ov = JSON.parse(localStorage.getItem("hs-admin-settings")); if (ov && typeof ov === "object") s = { ...s, ...ov }; } catch {}
+  base = String(s.apiBase || "").trim().replace(/\/+$/, "");
+  if (!base) { $("noApi").hidden = false; return; }
+  $("sharedBox").hidden = false;
+  $("tabs").hidden = false;
+  $("serverAddr").textContent = base.startsWith("/") ? location.origin + base : base;
+  try { token = sessionStorage.getItem(TOKEN_KEY) || ""; } catch {}
+  await loadProducts();
+  if (token) load(); else $("sharedMsg").textContent = "Enter the password to see comments.";
+})();
+</script>
+</body>
+</html>
