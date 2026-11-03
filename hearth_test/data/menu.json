@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T21:06:12.567Z",
+  "generatedAt": "2026-11-03T22:14:25.992Z",
   "currency": "USD",
   "categories": [
     "Bread",
@@ -10,7 +10,58 @@
     {
       "id": "CHLLH-PLN",
       "skuId": "019f815c-520b-771a-a47f-9cd237cdd08c",
-      "name": "Challah",
+      "groupId": "019f815c-4cf7-70e1-8cae-be871a340558",
+      "groupName": "Challah",
+      "variant": "Plain",
+      "attrs": {
+        "topping": "plain"
+      },
+      "name": "Challah, Plain",
+      "note": "",
+      "image": null,
+      "price": 9.75,
+      "category": "Bread"
+    },
+    {
+      "id": "CHLLH-VRYTHNG",
+      "skuId": "01a1842f-0170-746d-b801-1a76f170d991",
+      "groupId": "019f815c-4cf7-70e1-8cae-be871a340558",
+      "groupName": "Challah",
+      "variant": "Everything",
+      "attrs": {
+        "topping": "everything"
+      },
+      "name": "Challah, Everything",
+      "note": "",
+      "image": null,
+      "price": 9.75,
+      "category": "Bread"
+    },
+    {
+      "id": "CHLLH-SSM",
+      "skuId": "01a1842f-0170-746d-b801-1ef9dcbfb62f",
+      "groupId": "019f815c-4cf7-70e1-8cae-be871a340558",
+      "groupName": "Challah",
+      "variant": "Sesame",
+      "attrs": {
+        "topping": "sesame"
+      },
+      "name": "Challah, Sesame",
+      "note": "",
+      "image": null,
+      "price": 9.75,
+      "category": "Bread"
+    },
+    {
+      "id": "CHLLH-RSN",
+      "skuId": "01a1842f-0170-746d-b801-23070c5a1d6b",
+      "groupId": "019f815c-4cf7-70e1-8cae-be871a340558",
+      "groupName": "Challah",
+      "variant": "Raisin",
+      "attrs": {
+        "topping": "raisin"
+      },
+      "name": "Challah, Raisin",
       "note": "",
       "image": null,
       "price": 9.75,
@@ -19,6 +70,10 @@
     {
       "id": "CNN-RLL-FCCC",
       "skuId": "01a14435-9330-7085-ad32-8381a0bbfd6f",
+      "groupId": "01a14435-8d1a-70df-9802-9582c2947ed5",
+      "groupName": "Cinnamon Roll Focaccia",
+      "variant": "",
+      "attrs": {},
       "name": "Cinnamon Roll Focaccia",
       "note": "",
       "image": null,
@@ -28,6 +83,10 @@
     {
       "id": "CNN-RLL-FC-HLF",
       "skuId": "01a14436-3be8-71f8-bceb-af614368d7df",
+      "groupId": "01a14436-3856-73e8-a401-f3365a60b0bc",
+      "groupName": "Cinnamon Roll Focaccia Half",
+      "variant": "",
+      "attrs": {},
       "name": "Cinnamon Roll Focaccia Half",
       "note": "",
       "image": null,
@@ -37,6 +96,10 @@
     {
       "id": "2-DZN-SM-CKS",
       "skuId": "01a08bcd-e91b-77bb-88e8-3f46a55abe60",
+      "groupId": "01a08bcd-e62a-7184-880c-4de3cc2f08a8",
+      "groupName": "2 Dozen Sm Cookies",
+      "variant": "",
+      "attrs": {},
       "name": "2 Dozen Sm Cookies",
       "note": "",
       "image": null,
@@ -44,8 +107,25 @@
       "category": "Catering"
     },
     {
+      "id": "BRD-PDDNG-TRY",
+      "skuId": "01a19370-7772-70d7-b7b5-938a91f56f45",
+      "groupId": "01a19370-743e-753b-a9be-1611438174f3",
+      "groupName": "Bread Pudding Tray",
+      "variant": "",
+      "attrs": {},
+      "name": "Bread Pudding Tray",
+      "note": "",
+      "image": null,
+      "price": 35,
+      "category": "Catering"
+    },
+    {
       "id": "LG-PRTY-TRY-CKS",
       "skuId": "01a0f7d5-278f-7094-ae1b-6b9df4db4299",
+      "groupId": "01a0f7d5-236b-7305-8a2d-ccde6c7cf5e7",
+      "groupName": "Large Party Tray Cookies",
+      "variant": "",
+      "attrs": {},
       "name": "Large Party Tray Cookies",
       "note": "",
       "image": null,
@@ -55,6 +135,10 @@
     {
       "id": "DZN-CKS",
       "skuId": "01a067d2-5f11-7208-a04b-5ed96a8655e5",
+      "groupId": "01a067d2-5bb5-73aa-9d8d-c7207bef5186",
+      "groupName": "Dozen Cookies",
+      "variant": "",
+      "attrs": {},
       "name": "Dozen Cookies",
       "note": "",
       "image": null,
@@ -64,6 +148,10 @@
     {
       "id": "PCN-P",
       "skuId": "01a18433-18f2-7098-973c-fe6eace37a78",
+      "groupId": "01a18433-1627-739c-b3b4-2ebfa7f2e403",
+      "groupName": "Pecan Pie",
+      "variant": "",
+      "attrs": {},
       "name": "Pecan Pie",
       "note": "",
       "image": null,
@@ -73,6 +161,10 @@
     {
       "id": "PMPKN-P",
       "skuId": "01a18432-a20b-764c-b8a9-9868b82cc322",
+      "groupId": "01a18432-9ef6-74cb-843a-97211e9bb35e",
+      "groupName": "Pumpkin Pie",
+      "variant": "",
+      "attrs": {},
       "name": "Pumpkin Pie",
       "note": "",
       "image": null,

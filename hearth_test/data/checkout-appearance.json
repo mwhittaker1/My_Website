@@ -1,0 +1,21 @@
+{
+  "theme": "base",
+  "variables": {
+    "primary": "#603820",
+    "primaryForeground": "#FFF8EA",
+    "accent": "#E0A858",
+    "accentForeground": "#2A1708",
+    "background": "#FAF6EE",
+    "foreground": "#33200F",
+    "card": "#FFFDF8",
+    "cardForeground": "#33200F",
+    "border": "#E4D6BF",
+    "input": "#FFFFFF",
+    "muted": "#F3E9D6",
+    "mutedForeground": "#6B5440",
+    "destructive": "#B8432B",
+    "destructiveForeground": "#FFFFFF",
+    "ring": "#603820",
+    "radius": "0.75rem"
+  }
+}

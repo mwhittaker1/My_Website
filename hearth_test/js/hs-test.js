@@ -47,6 +47,15 @@ flow.setAttribute("aria-modal", "true");
 flow.setAttribute("aria-label", "Test cart and checkout");
 document.body.appendChild(flow);
 
+// Brand colours for the checkout. These are the same appearance settings GoDaddy's hosted checkout accepts
+// (see data/checkout-appearance.json), so this page previews how that checkout would look in our colours.
+fetch("data/checkout-appearance.json", { cache: "no-cache" })
+  .then((r) => (r.ok ? r.json() : null))
+  .then((a) => {
+    for (const [k, v] of Object.entries(a?.variables ?? {})) flow.style.setProperty("--hs-" + k.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()), String(v));
+  })
+  .catch(() => {});
+
 let step = "cart";
 let busy = false;
 let captcha = "idle"; // idle | checking | ok
@@ -103,7 +112,7 @@ function cartHtml() {
 function checkoutHtml() {
   return `<div class="fl-top"><span class="fl-store">Hearth and Soul Bakery</span><button class="fl-link" data-act="back">← Back to cart</button></div>
     <h1>Checkout</h1>
-    <div class="fl-hint"><strong>Testing only.</strong> Use card <code>4242 4242 4242 4242</code>, any future date, any 3 digits, any ZIP. Real card numbers are rejected and never sent anywhere.</div>
+    <div class="fl-hint"><strong>Testing only.</strong> Use card <code>4242 4242 4242 4242</code>, any future date, any 3 digits, any ZIP. Real card numbers are rejected and never sent anywhere. The colours here are the brand settings we can send to GoDaddy’s checkout; its layout and logo can’t be changed.</div>
     <div class="fl-grid"><form id="flForm" novalidate autocomplete="off"><div>
       <div class="fl-card"><h2>Contact</h2>
         <label>Email<input type="email" data-field="email" value="${esc(cust.email)}" autocomplete="email" maxlength="254"></label>
