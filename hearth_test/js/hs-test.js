@@ -84,7 +84,7 @@ function pickupBlock() {
 
 function summaryHtml(withTax) {
   const t = totals();
-  return `<div class="fl-card"><h2>Order summary</h2>
+  return `<div class="fl-card fl-summary"><h2>Order summary</h2>
     <ul class="fl-lines">${lines().map((i) => `<li><span class="nm">${HS.qty(i.id)} × ${esc(i.name)}</span><span>${cents(lineCents(i))}</span></li>`).join("")}</ul>
     <div class="fl-sum"><span>Subtotal</span><span>${cents(t.sub)}</span></div>
     <div class="fl-sum"><span>${withTax ? `Estimated tax (${(taxRate() * 100).toFixed(0)}%, test value)` : "Taxes"}</span><span>${withTax ? cents(t.tax) : "Calculated at checkout"}</span></div>
