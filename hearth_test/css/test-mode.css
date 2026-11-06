@@ -57,3 +57,5 @@
 #hsflow .fl-done{text-align:center;padding:2rem 1rem}
 #hsflow .fl-done .tick{width:3.5rem;height:3.5rem;border-radius:50%;background:var(--hs-primary,#1a8a3a);color:var(--hs-primary-foreground,#fff);display:grid;place-items:center;font-size:1.8rem;margin:0 auto 1rem}
 @media(prefers-reduced-motion:reduce){#hsflow .fl-captcha .spin{animation:none}}
+/* GoDaddy paints the whole order-summary panel with its secondary-background colour, so the preview does too. */
+#hsflow .fl-summary{background:var(--hs-secondary-background,var(--hs-card,#fff))}

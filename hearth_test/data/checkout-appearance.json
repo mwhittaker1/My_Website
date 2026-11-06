@@ -16,6 +16,11 @@
     "destructive": "#B8432B",
     "destructiveForeground": "#FFFFFF",
     "ring": "#603820",
-    "radius": "0.75rem"
+    "radius": "0.75rem",
+    "secondaryBackground": "#F3E9D6",
+    "secondary": "#F3E9D6",
+    "secondaryForeground": "#33200F",
+    "popover": "#FFFDF8",
+    "popoverForeground": "#33200F"
   }
 }
