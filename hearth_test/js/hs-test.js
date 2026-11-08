@@ -105,6 +105,8 @@ function cartHtml() {
       ${pickupBlock()}
     </div><div>${ls.length ? summaryHtml(false) : ""}
       <button class="fl-btn" data-act="checkout" ${ready ? "" : "disabled"}>Checkout</button>
+      ${realLive && ls.length ? `<div class="fl-hint" style="margin-top:1rem"><strong>Real checkout (GoDaddy).</strong> Creates a real order in the store. It is limited to the free test item right now. GoDaddy asks for the pickup time itself, so the time chosen on this page is not carried over.</div>
+      <button class="fl-btn ghost" data-act="real">Go to GoDaddy’s secure checkout</button>` : ""}
       <p class="fl-err" id="flErr">${ls.length && sel.slotStart !== null && !ready ? "That pickup time is no longer available. Go back and choose another." : ""}</p>
     </div></div>`;
 }
@@ -180,6 +182,42 @@ function closeFlow() {
   step = "cart";
 }
 HS.openCart = openFlow;
+
+// Real checkout is offered only when the server says it is switched on (keys set and CHECKOUT_LIVE=1).
+let realLive = false;
+const apiBase = () => String(HS.settings().apiBase || "").trim().replace(/\/+$/, "");
+if (apiBase()) {
+  fetch(apiBase() + "/status")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((s) => { realLive = !!(s && s.checkoutLive); })
+    .catch(() => {});
+}
+async function startReal(btn) {
+  if (busy || !lines().length) return;
+  busy = true;
+  btn.disabled = true;
+  btn.textContent = "Opening checkout…";
+  try {
+    const res = await fetch(apiBase() + "/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines: lines().map((i) => ({ id: i.id, qty: HS.qty(i.id) })) }) });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !/^https:\/\//.test(body.url || "")) throw new Error(body.error || "We couldn’t start checkout.");
+    window.location.assign(body.url);
+  } catch (err) {
+    busy = false;
+    btn.disabled = false;
+    btn.textContent = "Go to GoDaddy’s secure checkout";
+    fail(err.message || "We couldn’t start checkout.");
+  }
+}
+// Back from GoDaddy after paying: a redirect alone is not proof of payment, so this only thanks them.
+if (new URLSearchParams(location.search).get("checkout") === "done") {
+  const note = document.createElement("div");
+  note.setAttribute("role", "status");
+  note.style.cssText = "background:#FFF3C4;border:2px solid #C9A227;color:#3a2a00;padding:.8rem 1rem;text-align:center;font:16px system-ui,sans-serif";
+  note.textContent = "Thanks! If your payment went through, GoDaddy emails your receipt. The bakery confirms orders on its side.";
+  document.body.prepend(note);
+  history.replaceState(null, "", location.pathname);
+}
 
 const fail = (msg) => {
   const el = $("flErr");
@@ -265,6 +303,7 @@ flow.addEventListener("click", (e) => {
     case "dec": HS.setQty(id, HS.qty(id) - 1); render(true); break;
     case "rm": HS.setQty(id, 0); render(true); break;
     case "checkout": step = "checkout"; captcha = "idle"; render(); break;
+    case "real": startReal(b); break;
     case "back": step = "cart"; render(); break;
     case "captcha":
       captcha = "checking"; paintCaptcha();
